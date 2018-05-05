@@ -5,6 +5,9 @@ class KnotConnection(object):
 		self.protocol = KnotProtocol(protocol)
 		self.credentials = credentials
 
+	def registerDevice(self, user_data={}):
+		result = self.protocol.registerDevice(self.credentials, user_data)
+		return result
 	def getDevices(self):
 		result = self.protocol.getDevices(self.credentials)
 		if isinstance(result, dict) and result.get('Error'):

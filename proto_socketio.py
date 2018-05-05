@@ -17,11 +17,17 @@ class KNoTNamespace(BaseNamespace):
 	def on_config(self, *args):
 		logging.info(args)
 
+	def on_register(self, *args):
+		logging.info('Registered')
+		ProtoSocketio.result = args[0]
+		self.close()
+
 	def on_ready(self, *args):
 		logging.info('Ready')
 		# The below 'switch' select which callback must be emitted
 		emit = {
-			'getDevices': lambda: self.emit('devices', { 'gateways':['*'] }, self.on_devices)
+			'getDevices': lambda: self.emit('devices', { 'gateways':['*'] }, self.on_devices),
+			'registerDevice': lambda: self.emit('register', ProtoSocketio.methodArgs, self.on_register)
 		}.get(ProtoSocketio.methodCall)
 		logging.info('Emitting signal for ' + ProtoSocketio.methodCall)
 		emit()
@@ -32,6 +38,7 @@ class KNoTNamespace(BaseNamespace):
 
 class ProtoSocketio(object):
 	methodCall = None
+	methodArgs = {}
 	cred = {}
 	result = {}
 	def getDevices(self, credentials):
@@ -43,3 +50,15 @@ class ProtoSocketio(object):
 			except Exception as err:
 				pass
 		return ProtoSocketio.result
+
+	def registerDevice(self, credentials, properties={}):
+		ProtoSocketio.cred = credentials
+		ProtoSocketio.methodArgs = properties
+		ProtoSocketio.methodCall = 'registerDevice'
+		with SocketIO(credentials['servername'], credentials['port'], KNoTNamespace) as socketIO:
+			try:
+				socketIO.wait()
+			except Exception as err:
+				pass
+		return ProtoSocketio.result
+
