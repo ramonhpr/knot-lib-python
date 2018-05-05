@@ -41,9 +41,11 @@ class ProtoSocketio(object):
 	methodArgs = {}
 	cred = {}
 	result = {}
-	def getDevices(self, credentials):
+
+	def __signinEmit(self, credentials, signalToEmit, properties={}):
 		ProtoSocketio.cred = credentials
-		ProtoSocketio.methodCall = 'getDevices'
+		ProtoSocketio.methodCall = signalToEmit
+		ProtoSocketio.methodArgs = properties
 		with SocketIO(credentials['servername'], credentials['port'], KNoTNamespace) as socketIO:
 			try:
 				socketIO.wait()
@@ -51,14 +53,9 @@ class ProtoSocketio(object):
 				pass
 		return ProtoSocketio.result
 
+	def getDevices(self, credentials):
+		return self.__signinEmit(credentials, 'getDevices') 
+
 	def registerDevice(self, credentials, properties={}):
-		ProtoSocketio.cred = credentials
-		ProtoSocketio.methodArgs = properties
-		ProtoSocketio.methodCall = 'registerDevice'
-		with SocketIO(credentials['servername'], credentials['port'], KNoTNamespace) as socketIO:
-			try:
-				socketIO.wait()
-			except Exception as err:
-				pass
-		return ProtoSocketio.result
+		return self.__signinEmit(credentials, 'registerDevice', properties)
 
