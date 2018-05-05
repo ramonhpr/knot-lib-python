@@ -11,5 +11,9 @@ class KnotProtocol(object):
 		properties.update(user_data)
 		return self.protocol.registerDevice(credentials, properties)
 
+	
+	def myDevices(self, credentials):
+		return self.protocol.myDevices(credentials)
+
 	def getDevices(self, credentials):
 		return self.protocol.getDevices(credentials)
