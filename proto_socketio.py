@@ -38,6 +38,11 @@ class KNoTNamespace(BaseNamespace):
 		logging.info('Emitting signal for ' + ProtoSocketio.methodCall)
 		emit()
 
+	def on_notReady(self, *args):
+		logging.info('notReady')
+		logging.info(args)
+		raise Exception('Not valid credentials')
+
 	def on_identify(self, *args):
 		logging.info('Identify')
 		self.emit('identity', ProtoSocketio.cred)
