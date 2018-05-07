@@ -9,7 +9,7 @@ class KNoTNamespace(BaseNamespace):
 
 	def on_devices(self, *args):
 		ProtoSocketio.result = args[0]
-		self.close()
+		self.disconnect()
 
 	def on_unregister(self, *args):
 		logging.info(args)
@@ -20,12 +20,12 @@ class KNoTNamespace(BaseNamespace):
 	def on_register(self, *args):
 		logging.info('Registered')
 		ProtoSocketio.result = args[0]
-		self.close()
+		self.disconnect()
 	
 	def on_mydevices(self, *args):
 		logging.info('MyDevices')
 		ProtoSocketio.result = args[0]
-		self.close()
+		self.disconnect()
 
 	def on_ready(self, *args):
 		logging.info('Ready')
