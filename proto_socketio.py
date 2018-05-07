@@ -68,10 +68,7 @@ class ProtoSocketio(object):
 		return self.__signinEmit(credentials, 'getDevices') 
 
 	def myDevices(self, credentials):
-		ProtoSocketio.cred = credentials
-		ProtoSocketio.methodCall = 'myDevices'
-		self.__signinEmit(credentials)
-		return ProtoSocketio.result
+		return self.__signinEmit(credentials, 'myDevices')
 
 	def registerDevice(self, credentials, properties={}):
 		return self.__signinEmit(credentials, 'registerDevice', properties)
