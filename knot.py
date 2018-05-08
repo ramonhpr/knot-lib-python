@@ -9,6 +9,10 @@ class KnotConnection(object):
 		result = self.protocol.registerDevice(self.credentials, user_data)
 		return result
 
+	def update(self, user_data={}):
+		result = self.protocol.update(self.credentials, user_data)
+		return result
+
 	def myDevices(self):
 		result = self.protocol.myDevices(self.credentials)
 		return result['devices']
@@ -19,3 +23,6 @@ class KnotConnection(object):
 			raise Exception(result.get('Error'))
 		else:
 			return result
+
+	def subscribe(self, uuid, onReceive=None):
+		self.protocol.subscribe(self.credentials, uuid, onReceive)

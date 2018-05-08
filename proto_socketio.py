@@ -14,8 +14,19 @@ class KNoTNamespace(BaseNamespace):
 	def on_unregister(self, *args):
 		logging.info(args)
 
+	def on_subscribe(self, *args):
+		logging.info('subscribe')
+		result = args[0]
+		logging.info(args[0])
+		if result.get('error'):
+			raise Exception(result['error']['error']['message'])
+
 	def on_config(self, *args):
-		logging.info(args)
+		logging.info('config')
+		logging.info(args[0])
+		if ProtoSocketio.methodCallBack:
+			ProtoSocketio().methodCallBack(args[0])
+			
 
 	def on_register(self, *args):
 		logging.info('Registered')
@@ -26,6 +37,11 @@ class KNoTNamespace(BaseNamespace):
 		logging.info('MyDevices')
 		ProtoSocketio.result = args[0]
 		self.disconnect()
+	
+	def on_update(self, *args):
+		logging.info('Update')
+		logging.info(args[0])
+		self.disconnect()
 
 	def on_ready(self, *args):
 		logging.info('Ready')
@@ -33,7 +49,9 @@ class KNoTNamespace(BaseNamespace):
 		emit = {
 			'getDevices': lambda: self.emit('devices', { 'gateways':['*'] }, self.on_devices),
 			'registerDevice': lambda: self.emit('register', ProtoSocketio.methodArgs, self.on_register),
-			'myDevices': lambda: self.emit('mydevices', { }, self.on_mydevices)
+			'myDevices': lambda: self.emit('mydevices', { }, self.on_mydevices),
+			'subscribe': lambda: self.emit('subscribe', ProtoSocketio.methodArgs, self.on_subscribe),
+			'update': lambda: self.emit('update', ProtoSocketio.methodArgs, self.on_update)
 		}.get(ProtoSocketio.methodCall)
 		logging.info('Emitting signal for ' + ProtoSocketio.methodCall)
 		emit()
@@ -50,17 +68,20 @@ class KNoTNamespace(BaseNamespace):
 class ProtoSocketio(object):
 	methodCall = None
 	methodArgs = {}
+	methodCallBack = None
 	cred = {}
 	result = {}
 
-	def __signinEmit(self, credentials, signalToEmit, properties={}):
+	def __signinEmit(self, credentials, signalToEmit, properties={}, callback=None):
 		ProtoSocketio.cred = credentials
 		ProtoSocketio.methodCall = signalToEmit
 		ProtoSocketio.methodArgs = properties
+		ProtoSocketio.methodCallBack = callback
 		with SocketIO(credentials['servername'], credentials['port'], KNoTNamespace) as socketIO:
 			try:
 				socketIO.wait()
 			except Exception as err:
+				print(err)
 				pass
 		return ProtoSocketio.result
 
@@ -72,4 +93,9 @@ class ProtoSocketio(object):
 
 	def registerDevice(self, credentials, properties={}):
 		return self.__signinEmit(credentials, 'registerDevice', properties)
-
+	
+	def subscribe(self, credentials, uuid, user_callback):
+		return self.__signinEmit(credentials, 'subscribe', {'uuid': uuid}, lambda socket, result: user_callback(result))
+	
+	def update(self, credentials, properties={}):
+		return self.__signinEmit(credentials, 'update', properties)
