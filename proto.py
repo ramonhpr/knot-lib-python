@@ -1,9 +1,11 @@
 import proto_socketio
+import proto_http
 
 class KnotProtocol(object):
 	def __init__(self, protocol):
 		self.protocol = {
-			'socketio': proto_socketio.ProtoSocketio()
+			'socketio': proto_socketio.ProtoSocketio(),
+			'http': proto_http.ProtoHttp()
 		}.get(protocol)
 
 	def registerDevice(self, credentials, user_data={}):
