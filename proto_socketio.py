@@ -40,6 +40,7 @@ class KNoTNamespace(BaseNamespace):
 	
 	def on_mydevices(self, *args):
 		logging.info('MyDevices')
+		logging.info(args[0])
 		ProtoSocketio.result = args[0]
 		self.disconnect()
 	
