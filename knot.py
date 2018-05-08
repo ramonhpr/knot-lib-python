@@ -9,6 +9,9 @@ class KnotConnection(object):
 		result = self.protocol.registerDevice(self.credentials, user_data)
 		return result
 
+	def unregisterDevice(self, user_data={}):
+		return self.protocol.unregisterDevice(self.credentials, user_data)
+
 	def update(self, user_data={}):
 		result = self.protocol.update(self.credentials, user_data)
 		return result

@@ -12,7 +12,12 @@ class KNoTNamespace(BaseNamespace):
 		self.disconnect()
 
 	def on_unregister(self, *args):
-		logging.info(args)
+		logging.info('Unregister')
+		result = args[0]
+		logging.info(result)
+		if result.get('error'):
+			raise Exception(result['error'])
+		self.disconnect()
 
 	def on_subscribe(self, *args):
 		logging.info('subscribe')
@@ -51,9 +56,10 @@ class KNoTNamespace(BaseNamespace):
 			'registerDevice': lambda: self.emit('register', ProtoSocketio.methodArgs, self.on_register),
 			'myDevices': lambda: self.emit('mydevices', { }, self.on_mydevices),
 			'subscribe': lambda: self.emit('subscribe', ProtoSocketio.methodArgs, self.on_subscribe),
-			'update': lambda: self.emit('update', ProtoSocketio.methodArgs, self.on_update)
-		}.get(ProtoSocketio.methodCall)
-		logging.info('Emitting signal for ' + ProtoSocketio.methodCall)
+			'update': lambda: self.emit('update', ProtoSocketio.methodArgs, self.on_update),
+			'unregister': lambda: self.emit('unregister', ProtoSocketio.methodArgs, self.on_unregister)
+		}.get(ProtoSocketio.methodName)
+		logging.info('Emitting signal for ' + ProtoSocketio.methodName)
 		emit()
 
 	def on_notReady(self, *args):
@@ -66,7 +72,7 @@ class KNoTNamespace(BaseNamespace):
 		self.emit('identity', ProtoSocketio.cred)
 
 class ProtoSocketio(object):
-	methodCall = None
+	methodName = None
 	methodArgs = {}
 	methodCallBack = None
 	cred = {}
@@ -74,7 +80,7 @@ class ProtoSocketio(object):
 
 	def __signinEmit(self, credentials, signalToEmit, properties={}, callback=None):
 		ProtoSocketio.cred = credentials
-		ProtoSocketio.methodCall = signalToEmit
+		ProtoSocketio.methodName = signalToEmit
 		ProtoSocketio.methodArgs = properties
 		ProtoSocketio.methodCallBack = callback
 		with SocketIO(credentials['servername'], credentials['port'], KNoTNamespace) as socketIO:
@@ -93,6 +99,9 @@ class ProtoSocketio(object):
 
 	def registerDevice(self, credentials, properties={}):
 		return self.__signinEmit(credentials, 'registerDevice', properties)
+
+	def unregisterDevice(self, credentials, properties={}):
+		return self.__signinEmit(credentials, 'unregister', properties)
 	
 	def subscribe(self, credentials, uuid, user_callback):
 		return self.__signinEmit(credentials, 'subscribe', {'uuid': uuid}, lambda socket, result: user_callback(result))

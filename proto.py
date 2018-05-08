@@ -10,6 +10,9 @@ class KnotProtocol(object):
 		properties = {'type':'KNoTDevice', 'owner': credentials['uuid']}
 		properties.update(user_data)
 		return self.protocol.registerDevice(credentials, properties)
+	
+	def unregisterDevice(self, credentials,user_data={}):
+		return self.protocol.unregisterDevice(credentials, user_data)
 
 	def myDevices(self, credentials):
 		return self.protocol.myDevices(credentials)
