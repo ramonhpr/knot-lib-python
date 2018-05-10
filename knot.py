@@ -30,5 +30,11 @@ class KnotConnection(object):
 		else:
 			return result
 
+	def readData(self, thing_uuid, user_data={}):
+		return self.protocol.readData(self.credentials, thing_uuid, user_data)
+
+	def postData(self, thing_uuid, user_data={}):
+		return self.protocol.postData(self.credentials, thing_uuid, user_data)
+
 	def subscribe(self, uuid, onReceive=None):
 		self.protocol.subscribe(self.credentials, uuid, onReceive)
