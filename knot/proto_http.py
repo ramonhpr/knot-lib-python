@@ -17,8 +17,11 @@ class ProtoHttp(object):
             raise Exception('Http Error')
 
     def readData(self, credentials, thing_uuid, user_data={}):
-        response = requests.get(self.__parseUrl(credentials) + '/data/' + thing_uuid, headers=self.__authHeaders(credentials), json=user_data)
+        # FIXME: Update it later to allow query parameter
+        response = requests.get(self.__parseUrl(credentials) + '/data/' + thing_uuid,
+                                    headers=self.__authHeaders(credentials), json=user_data)
         return response.json()
 
     def postData(self, credentials, user_data={}):
-        response = requests.post(self.__parseUrl(credentials) + '/data/' + user_data.get('uuid'), headers=self.__authHeaders(credentials), json=user_data)
+        response = requests.post(self.__parseUrl(credentials) + '/data/' + user_data.get('uuid'),
+                                    headers=self.__authHeaders(credentials), json=user_data)

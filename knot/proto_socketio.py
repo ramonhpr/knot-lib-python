@@ -89,6 +89,7 @@ class ProtoSocketio(object):
 	result = {}
 
 	def __signinEmit(self, credentials, signalToEmit, properties={}, callback=None):
+		# FIXME: Show message error when cloud is not running
 		ProtoSocketio.cred = credentials
 		ProtoSocketio.methodName = signalToEmit
 		ProtoSocketio.methodArgs = properties
@@ -118,5 +119,6 @@ class ProtoSocketio(object):
 
 	def update(self, credentials, properties={}):
 		return self.__signinEmit(credentials, 'update', properties)
+
 	def postData(self, credentials, user_data={}):
 		return self.__signinEmit(credentials, 'data', user_data)
