@@ -31,24 +31,30 @@ class KNoTNamespace(BaseNamespace):
 		logging.info(args[0])
 		if ProtoSocketio.methodCallBack:
 			ProtoSocketio().methodCallBack(args[0])
-	def on_error(self, data):
+	def on_error(self, *args):
 		logging.info('error')
-		logging.info(data)
+		logging.info(args)
 
 	def on_register(self, *args):
 		logging.info('Registered')
 		ProtoSocketio.result = args[0]
 		self.disconnect()
-	
+
 	def on_mydevices(self, *args):
 		logging.info('MyDevices')
 		logging.info(args[0])
 		ProtoSocketio.result = args[0]
 		self.disconnect()
-	
+
 	def on_update(self, *args):
 		logging.info('Update')
 		logging.info(args[0])
+		self.disconnect()
+
+	def on_data(self, *args):
+		logging.info('Post Data')
+		logging.info(args)
+		ProtoSocketio.result = args[0] if args else None
 		self.disconnect()
 
 	def on_ready(self, *args):
@@ -60,7 +66,8 @@ class KNoTNamespace(BaseNamespace):
 			'myDevices': lambda: self.emit('mydevices', { }, self.on_mydevices),
 			'subscribe': lambda: self.emit('subscribe', ProtoSocketio.methodArgs, self.on_subscribe),
 			'update': lambda: self.emit('update', ProtoSocketio.methodArgs, self.on_update),
-			'unregister': lambda: self.emit('unregister', ProtoSocketio.methodArgs, self.on_unregister)
+			'unregister': lambda: self.emit('unregister', ProtoSocketio.methodArgs, self.on_unregister),
+			'data': lambda : self.emit('data', ProtoSocketio.methodArgs, self.on_data)
 		}.get(ProtoSocketio.methodName)
 		logging.info('Emitting signal for ' + ProtoSocketio.methodName)
 		emit()
@@ -95,7 +102,7 @@ class ProtoSocketio(object):
 		return ProtoSocketio.result
 
 	def getDevices(self, credentials):
-		return self.__signinEmit(credentials, 'getDevices') 
+		return self.__signinEmit(credentials, 'getDevices')
 
 	def myDevices(self, credentials):
 		return self.__signinEmit(credentials, 'myDevices')
@@ -105,9 +112,11 @@ class ProtoSocketio(object):
 
 	def unregisterDevice(self, credentials, properties={}):
 		return self.__signinEmit(credentials, 'unregister', properties)
-	
+
 	def subscribe(self, credentials, uuid, user_callback):
 		return self.__signinEmit(credentials, 'subscribe', {'uuid': uuid}, lambda socket, result: user_callback(result))
-	
+
 	def update(self, credentials, properties={}):
 		return self.__signinEmit(credentials, 'update', properties)
+	def postData(self, credentials, user_data={}):
+		return self.__signinEmit(credentials, 'data', user_data)
