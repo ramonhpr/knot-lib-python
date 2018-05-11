@@ -31,10 +31,26 @@ class KnotConnection(object):
 			return result
 
 	def readData(self, thing_uuid, user_data={}):
-		return self.protocol.readData(self.credentials, thing_uuid, user_data)
+		result = self.protocol.readData(self.credentials, thing_uuid, user_data)
+		if result.get('error'):
+			raise Exception(result.get('error'))
+		else:
+			return result.get('data')
 
 	def postData(self, thing_uuid, user_data={}):
 		return self.protocol.postData(self.credentials, thing_uuid, user_data)
 
 	def subscribe(self, uuid, onReceive=None):
 		self.protocol.subscribe(self.credentials, uuid, onReceive)
+
+	# The bellow methods just use in specific protocols
+	def setData(self, thing_uuid, sensor_id, value):
+		properties = {
+			'uuid': thing_uuid,
+			'set_data': [{
+				'sensor_id': sensor_id,
+				'value': value
+				}]
+		}
+
+		return self.protocol.update(self.credentials, properties)

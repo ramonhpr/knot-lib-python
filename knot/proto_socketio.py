@@ -31,7 +31,9 @@ class KNoTNamespace(BaseNamespace):
 		logging.info(args[0])
 		if ProtoSocketio.methodCallBack:
 			ProtoSocketio().methodCallBack(args[0])
-			
+	def on_error(self, data):
+		logging.info('error')
+		logging.info(data)
 
 	def on_register(self, *args):
 		logging.info('Registered')
