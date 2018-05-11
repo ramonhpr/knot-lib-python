@@ -25,11 +25,13 @@ class KnotProtocol(object):
 	def subscribe(self, credentials, uuid, onReceive=None):
 		self.protocol.subscribe(credentials, uuid, onReceive)
 
-	def update(self, credentials, properties={}):
-		return self.protocol.update(credentials, properties)
+	def update(self, credentials, user_data={}):
+		return self.protocol.update(credentials, user_data)
 
-	def readData(self, credentials, thing_uuid, properties={}):
-		return proto_http.ProtoHttp().readData(credentials, thing_uuid, properties)
+	def readData(self, credentials, thing_uuid, user_data={}):
+		return proto_http.ProtoHttp().readData(credentials, thing_uuid, user_data)
 
-	def postData(self, credentials, thing_uuid, properties={}):
-		return proto_http.ProtoHttp().postData(credentials, thing_uuid, properties)
+	def postData(self, credentials, thing_uuid, user_data={}):
+		properties = {'uuid': thing_uuid}
+		properties.update(user_data)
+		return self.protocol.postData(credentials, properties)

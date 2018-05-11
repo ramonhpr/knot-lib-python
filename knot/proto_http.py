@@ -20,5 +20,5 @@ class ProtoHttp(object):
         response = requests.get(self.__parseUrl(credentials) + '/data/' + thing_uuid, headers=self.__authHeaders(credentials), json=user_data)
         return response.json()
 
-    def postData(self, credentials, thing_uuid, user_data={}):
-        response = requests.post(self.__parseUrl(credentials) + '/data/' + thing_uuid, headers=self.__authHeaders(credentials), json=user_data)
+    def postData(self, credentials, user_data={}):
+        response = requests.post(self.__parseUrl(credentials) + '/data/' + user_data.get('uuid'), headers=self.__authHeaders(credentials), json=user_data)
