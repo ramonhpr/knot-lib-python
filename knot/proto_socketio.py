@@ -89,12 +89,11 @@ class ProtoSocketio(object):
 	result = {}
 
 	def __signinEmit(self, credentials, signalToEmit, properties={}, callback=None):
-		# FIXME: Show message error when cloud is not running
 		ProtoSocketio.cred = credentials
 		ProtoSocketio.methodName = signalToEmit
 		ProtoSocketio.methodArgs = properties
 		ProtoSocketio.methodCallBack = callback
-		with SocketIO(credentials['servername'], credentials['port'], KNoTNamespace) as socketIO:
+		with SocketIO(credentials['servername'], credentials['port'], KNoTNamespace, wait_for_connection=False) as socketIO:
 			try:
 				socketIO.wait()
 			except Exception as err:
