@@ -8,6 +8,14 @@ class ProtoHttp(object):
             'meshblu_auth_uuid': credentials.get('uuid'),
             'meshblu_auth_token': credentials.get('token')
         }
+    def __queryParameter(self, data):
+        ret = ''
+        if data.get('query'):
+            query = data.get('query')
+            ret = ret + '?'
+            for key in query:
+                ret = ret + key + '=' + str(query.get(key)) + '&'
+        return ret
 
     def registerDevice(self, credentials, user_data={}):
         response = requests.post(self.__parseUrl(credentials) + '/devices', json=user_data)
@@ -17,8 +25,7 @@ class ProtoHttp(object):
             raise Exception('Http Error')
 
     def readData(self, credentials, thing_uuid, user_data={}):
-        # FIXME: Update it later to allow query parameter
-        response = requests.get(self.__parseUrl(credentials) + '/data/' + thing_uuid,
+        response = requests.get(self.__parseUrl(credentials) + '/data/' + thing_uuid + self.__queryParameter(user_data),
                                     headers=self.__authHeaders(credentials), json=user_data)
         return response.json()
 
