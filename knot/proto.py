@@ -45,5 +45,13 @@ class KnotProtocol(object):
 				}]
 		}
 		return proto_socketio.ProtoSocketio().update(credentials, properties)
-	#TODO: getdata
+
+	def getData(self, credentials, thing_uuid, sensor_id):
+		properties = {
+			'uuid': thing_uuid,
+			'get_data': [{
+				'sensor_id': sensor_id
+				}]
+		}
+		return proto_socketio.ProtoSocketio().update(credentials, properties)
 	#TODO: setconfig

@@ -46,3 +46,6 @@ class KnotConnection(object):
 
 	def setData(self, thing_uuid, sensor_id, value):
 		return self.protocol.setData(self.credentials, thing_uuid, sensor_id, value)
+
+	def getData(self, thing_uuid, sensor_id):
+		return self.protocol.getData(self.credentials, thing_uuid, sensor_id)
