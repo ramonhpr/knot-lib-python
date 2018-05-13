@@ -45,12 +45,4 @@ class KnotConnection(object):
 			return result.get('data')
 
 	def setData(self, thing_uuid, sensor_id, value):
-		properties = {
-			'uuid': thing_uuid,
-			'set_data': [{
-				'sensor_id': sensor_id,
-				'value': value
-				}]
-		}
-
-		return self.protocol.update(self.credentials, properties)
+		return self.protocol.setData(self.credentials, thing_uuid, sensor_id, value)
