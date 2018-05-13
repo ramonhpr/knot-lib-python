@@ -54,4 +54,16 @@ class KnotProtocol(object):
 				}]
 		}
 		return proto_socketio.ProtoSocketio().update(credentials, properties)
-	#TODO: setconfig
+
+	def setConfig(self, credentials, thing_uuid, sensor_id, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
+		properties = {
+			'uuid': thing_uuid,
+			'config': [{
+				'sensor_id': sensor_id,
+				'event_flags': eventFlags,
+				'time_sec': timeSec,
+				'lower_limit': lowerLimit,
+				'upper_limit': upperLimit
+				}]
+		}
+		return proto_socketio.ProtoSocketio().update(credentials, properties)
