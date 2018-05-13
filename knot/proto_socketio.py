@@ -87,7 +87,7 @@ class ProtoSocketio(object):
 	result = {}
 
 	def __signinEmit(self, credentials, signalToEmit, properties={}, callback=None):
-		ProtoSocketio.cred = credentials
+		ProtoSocketio.cred = {'uuid': credentials.get('uuid'), 'token': credentials.get('token')}
 		ProtoSocketio.methodName = signalToEmit
 		ProtoSocketio.methodArgs = properties
 		ProtoSocketio.methodCallBack = callback
