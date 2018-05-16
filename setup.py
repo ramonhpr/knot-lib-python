@@ -18,7 +18,7 @@ setup(
     keywords = "IoT dataAnalytics API web",
     url = "https://github.com/ramonhpr/knot-python-api",
     install_requires=['socketIO_client'],
-    packages=find_packages(),
+    packages=['knot'],
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 3 - Alpha",

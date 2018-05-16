@@ -1,11 +1,11 @@
-import proto_socketio
-import proto_http
+from .proto_socketio import ProtoSocketio
+from .proto_http import ProtoHttp
 
 class KnotProtocol(object):
 	def __init__(self, protocol):
 		self.protocol = {
-			'socketio': proto_socketio.ProtoSocketio(),
-			'http': proto_http.ProtoHttp()
+			'socketio': ProtoSocketio(),
+			'http': ProtoHttp()
 		}.get(protocol)
 
 	def registerDevice(self, credentials, user_data={}):
@@ -29,7 +29,7 @@ class KnotProtocol(object):
 		return self.protocol.update(credentials, user_data)
 
 	def readData(self, credentials, thing_uuid, user_data={}):
-		return proto_http.ProtoHttp().readData(credentials, thing_uuid, user_data)
+		return ProtoHttp().readData(credentials, thing_uuid, user_data)
 
 	def postData(self, credentials, thing_uuid, user_data={}):
 		properties = {'uuid': thing_uuid}
@@ -44,7 +44,7 @@ class KnotProtocol(object):
 				'value': value
 				}]
 		}
-		return proto_socketio.ProtoSocketio().update(credentials, properties)
+		return ProtoSocketio().update(credentials, properties)
 
 	def getData(self, credentials, thing_uuid, sensor_id):
 		properties = {
@@ -53,7 +53,7 @@ class KnotProtocol(object):
 				'sensor_id': sensor_id
 				}]
 		}
-		return proto_socketio.ProtoSocketio().update(credentials, properties)
+		return ProtoSocketio().update(credentials, properties)
 
 	def setConfig(self, credentials, thing_uuid, sensor_id, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
 		properties = {
@@ -66,4 +66,4 @@ class KnotProtocol(object):
 				'upper_limit': upperLimit
 				}]
 		}
-		return proto_socketio.ProtoSocketio().update(credentials, properties)
+		return ProtoSocketio().update(credentials, properties)

@@ -1,4 +1,4 @@
-from proto import KnotProtocol
+from .proto import KnotProtocol
 
 class KnotConnection(object):
 	def __init__(self, protocol, credentials):
