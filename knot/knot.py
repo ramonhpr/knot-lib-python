@@ -19,7 +19,10 @@ class KnotConnection(object):
 	def myDevices(self):
 		result = self.protocol.myDevices(self.credentials)
 		if result.get('error'):
-			raise Exception(result.get('error').get('message'))
+			if isinstance(result.get('error'), dict): 
+				raise Exception(result.get('error').get('message'))
+			else:
+				raise Exception(result.get('error'))
 		else:
 			return result.get('devices')
 

@@ -39,6 +39,21 @@ class ProtoHttp(object):
             raise Exception('Http Error')
         else:
             return response.text
+    def myDevices(self, credentials, user_data={}):
+        url = self.__parseUrl(credentials) + '/mydevices'
+        logging.info('GET ' + url)
+        response = requests.get(url, headers=self.__authHeaders(credentials))
+        logging.info('json -> '+ str(user_data))
+        logging.info('status_code -> ' + str(response.status_code))
+        logging.info('response_json -> ' + str(response.json()))
+        if response.status_code == 200:
+            return response.json()
+        elif response.status_code == 404:
+            raise Exception('Http Error')
+        elif response.status_code == 401:
+            return response.json()
+        else:
+            return response.text
 
     def readData(self, credentials, thing_uuid, user_data={}):
         url = self.__parseUrl(credentials) + '/data/' + thing_uuid + self.__queryParameter(user_data)
