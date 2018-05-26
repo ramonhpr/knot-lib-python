@@ -1,4 +1,5 @@
 from .proto import KnotProtocol
+from .evt_flag import EvtFlagsEnum
 
 class KnotConnection(object):
 	def __init__(self, protocol, credentials):
@@ -53,9 +54,8 @@ class KnotConnection(object):
 
 	def getData(self, thing_uuid, sensor_id):
 		return self.protocol.getData(self.credentials, thing_uuid, sensor_id)
-	
+
 	def setConfig(self, thing_uuid, sensor_id, eventFlags=8, timeSec=0,
 					 lowerLimit=0, upperLimit=0):
-		# TODO: Make a enum to map the eventFlags
 		return self.protocol.setConfig(self.credentials, thing_uuid, sensor_id,
 									 eventFlags, timeSec, lowerLimit, upperLimit)
