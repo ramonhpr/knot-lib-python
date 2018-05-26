@@ -25,8 +25,8 @@ class KnotProtocol(object):
 	def update(self, credentials, user_data={}):
 		return self.protocol.update(credentials, user_data)
 
-	def readData(self, credentials, thing_uuid, user_data={}):
-		return ProtoHttp().readData(credentials, thing_uuid, user_data)
+	def readData(self, credentials, thing_uuid, **kwargs):
+		return self.protocol.readData(credentials, thing_uuid, **kwargs)
 
 	def postData(self, credentials, thing_uuid, user_data={}):
 		properties = {'uuid': thing_uuid}

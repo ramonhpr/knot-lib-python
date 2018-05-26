@@ -41,8 +41,8 @@ class KnotConnection(object):
 		else:
 			return result
 
-	def readData(self, thing_uuid, user_data={}):
-		result = self.protocol.readData(self.credentials, thing_uuid, user_data)
+	def readData(self, thing_uuid, **kwargs): 
+		result = self.protocol.readData(self.credentials, thing_uuid, **kwargs)
 		if result.get('error'):
 			raise Exception(result.get('error'))
 		else:

@@ -57,6 +57,12 @@ class KNoTNamespace(BaseNamespace):
 		ProtoSocketio.result = args[0] if args else None
 		self.disconnect()
 
+	def on_getdata(self, *args):
+		logging.info('Get data')
+		logging.info(args[0])
+		ProtoSocketio.result = args[0]
+		self.disconnect()
+
 	def on_ready(self, *args):
 		logging.info('Ready')
 		# The below 'switch' select which callback must be emitted
@@ -67,7 +73,8 @@ class KNoTNamespace(BaseNamespace):
 			'subscribe': lambda: self.emit('subscribe', ProtoSocketio.methodArgs, self.on_subscribe),
 			'update': lambda: self.emit('update', ProtoSocketio.methodArgs, self.on_update),
 			'unregister': lambda: self.emit('unregister', ProtoSocketio.methodArgs, self.on_unregister),
-			'data': lambda : self.emit('data', ProtoSocketio.methodArgs, self.on_data)
+			'data': lambda : self.emit('data', ProtoSocketio.methodArgs, self.on_data),
+			'getdata': lambda : self.emit('getdata', ProtoSocketio.methodArgs, self.on_getdata)
 		}.get(ProtoSocketio.methodName)
 		logging.info('Emitting signal for ' + ProtoSocketio.methodName)
 		emit()
@@ -121,3 +128,14 @@ class ProtoSocketio(object):
 
 	def postData(self, credentials, user_data={}):
 		return self.__signinEmit(credentials, 'data', user_data)
+
+	def readData(self, credentials, uuid, **kwargs):
+		kwargs.update({
+			'uuid': credentials.get('uuid'),
+			'token': credentials.get('token'),
+			'target': uuid,
+			'limit': kwargs.get('limit'),
+			'start': kwargs.get('start'),
+			'stop': kwargs.get('stop')
+		})
+		return self.__signinEmit(credentials, 'getdata', kwargs)
