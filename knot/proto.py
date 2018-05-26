@@ -19,9 +19,6 @@ class KnotProtocol(object):
 	def myDevices(self, credentials):
 		return self.protocol.myDevices(credentials)
 
-	def getDevices(self, credentials):
-		return self.protocol.getDevices(credentials)
-
 	def subscribe(self, credentials, uuid, onReceive=None):
 		self.protocol.subscribe(credentials, uuid, onReceive)
 
@@ -35,6 +32,12 @@ class KnotProtocol(object):
 		properties = {'uuid': thing_uuid}
 		properties.update(user_data)
 		return self.protocol.postData(credentials, properties)
+
+	def getThings(self, credentials, gateways=['*']):
+		properties = {
+			'gateways': gateways
+		}
+		return ProtoSocketio().getDevices(credentials, properties)
 
 	def setData(self, credentials, thing_uuid, sensor_id, value):
 		properties = {

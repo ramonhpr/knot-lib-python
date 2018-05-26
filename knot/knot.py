@@ -26,13 +26,6 @@ class KnotConnection(object):
 		else:
 			return result.get('devices')
 
-	def getDevices(self):
-		result = self.protocol.getDevices(self.credentials)
-		if isinstance(result, dict) and result.get('Error'):
-			raise Exception(result.get('Error'))
-		else:
-			return result
-
 	def subscribe(self, uuid, onReceive=None):
 		self.protocol.subscribe(self.credentials, uuid, onReceive)
 
@@ -40,6 +33,14 @@ class KnotConnection(object):
 		return self.protocol.postData(self.credentials, thing_uuid, user_data)
 
 	# The bellow methods just use in specific protocols
+
+	def getThings(self):
+		result = self.protocol.getDevices(self.credentials)
+		if isinstance(result, dict) and result.get('Error'):
+			raise Exception(result.get('Error'))
+		else:
+			return result
+
 	def readData(self, thing_uuid, user_data={}):
 		result = self.protocol.readData(self.credentials, thing_uuid, user_data)
 		if result.get('error'):
