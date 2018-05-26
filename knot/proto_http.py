@@ -11,11 +11,10 @@ class ProtoHttp(object):
         }
     def __queryParameter(self, data):
         ret = ''
-        if data.get('query'):
-            query = data.get('query')
+        logging.info(data)
+        for key in data:
             ret = ret + '?'
-            for key in query:
-                ret = ret + key + '=' + str(query.get(key)) + '&'
+            ret = ret + key + '=' + str(data.get(key)) + '&'
         return ret
 
     def registerDevice(self, credentials, user_data={}):
@@ -23,6 +22,8 @@ class ProtoHttp(object):
         logging.info('POST ' + url)
         logging.info('json -> '+ str(user_data))
         response = requests.post(url, json=user_data)
+        logging.info('status_code -> ' + str(response.status_code))
+        logging.info('response_json -> ' + str(response.json()))
         if response.status_code == 201:
             return response.json()
         elif response.status_code == 404:
@@ -33,6 +34,7 @@ class ProtoHttp(object):
         logging.info('DELETE ' + url)
         response = requests.delete(url, headers=self.__authHeaders(credentials))
         logging.info('status_code -> ' + str(response.status_code))
+        logging.info('response_json -> ' + str(response.json()))
         if response.status_code == 200:
             return response.json()
         elif response.status_code == 404:
@@ -42,8 +44,8 @@ class ProtoHttp(object):
     def myDevices(self, credentials, user_data={}):
         url = self.__parseUrl(credentials) + '/mydevices'
         logging.info('GET ' + url)
-        response = requests.get(url, headers=self.__authHeaders(credentials))
         logging.info('json -> '+ str(user_data))
+        response = requests.get(url, headers=self.__authHeaders(credentials))
         logging.info('status_code -> ' + str(response.status_code))
         logging.info('response_json -> ' + str(response.json()))
         if response.status_code == 200:
@@ -55,11 +57,13 @@ class ProtoHttp(object):
         else:
             return response.text
 
-    def readData(self, credentials, thing_uuid, user_data={}):
-        url = self.__parseUrl(credentials) + '/data/' + thing_uuid + self.__queryParameter(user_data)
+    def readData(self, credentials, thing_uuid, **kwargs):
+        url = self.__parseUrl(credentials) + '/data/' + thing_uuid + self.__queryParameter(kwargs)
         logging.info('GET ' + url)
-        logging.info('json -> '+ str(user_data))
-        response = requests.get(url, headers=self.__authHeaders(credentials), json=user_data)
+        logging.info('json -> '+ str(kwargs))
+        response = requests.get(url, headers=self.__authHeaders(credentials), json=kwargs)
+        logging.info('status_code -> ' + str(response.status_code))
+        logging.info('response_json -> ' + str(response.json()))
         return response.json()
 
     def postData(self, credentials, user_data={}):
@@ -67,3 +71,4 @@ class ProtoHttp(object):
         logging.info('POST ' + url)
         logging.info('json -> '+ str(user_data))
         response = requests.post(url, headers=self.__authHeaders(credentials), json=user_data)
+        logging.info('status_code -> ' + str(response.status_code))
