@@ -8,5 +8,5 @@
 $ sudo pip install virtualenv
 $ virtualenv ~/env_name
 $ . ~/envname/bin/activate
-$ python setup.py install
+$ pip install .
 ```
