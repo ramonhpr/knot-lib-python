@@ -1,5 +1,6 @@
 import requests
 import logging
+import json
 
 class ProtoHttp(object):
     def __parseUrl(self, credentials):
@@ -51,6 +52,17 @@ class ProtoHttp(object):
             return response.json()
         except:
             return response.text
+
+    def subscribe(self, credentials, uuid, onReceive=None):
+        url = self.__parseUrl(credentials) + '/subscribe/' + uuid
+        logging.info('GET ' + url)
+        with requests.get(url, headers=self.__authHeaders(credentials), stream=True) as response:
+            logging.info('status_code -> ' + str(response.status_code))
+            for line in response.iter_lines():
+                if line:
+                    line_decoded = line.decode('utf-8')
+                    logging.info('Received ' + line_decoded)
+                    onReceive(json.loads(line_decoded))
 
     def update(self, credentials, user_data={}):
         url = self.__parseUrl(credentials) + '/devices/' + user_data.get('uuid')
