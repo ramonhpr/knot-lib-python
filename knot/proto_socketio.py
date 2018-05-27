@@ -100,12 +100,9 @@ class ProtoSocketio(object):
 		ProtoSocketio.methodName = signalToEmit
 		ProtoSocketio.methodArgs = properties
 		ProtoSocketio.methodCallBack = callback
+		ProtoSocketio.result = {}
 		with SocketIO(credentials['servername'], credentials['port'], KNoTNamespace, wait_for_connection=False) as socketIO:
-			try:
-				socketIO.wait()
-			except Exception as err:
-				print(err)
-				pass
+			socketIO.wait()
 		return ProtoSocketio.result
 
 	def myDevices(self, credentials):
