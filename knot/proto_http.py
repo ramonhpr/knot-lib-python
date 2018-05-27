@@ -52,6 +52,19 @@ class ProtoHttp(object):
         except:
             return response.text
 
+    def update(self, credentials, user_data={}):
+        url = self.__parseUrl(credentials) + '/devices/' + user_data.get('uuid')
+        logging.info('GET ' + url)
+        logging.info('json -> ' + str(user_data))
+        response = requests.put(url, headers=self.__authHeaders(credentials), json=user_data)
+        logging.info('status_code -> ' + str(response.status_code))
+        try:
+            logging.info('response_json -> ' + str(response.json()))
+            return response.json()
+        except:
+            logging.info('response_text-> ' + str(response.text))
+            return response.text
+
     def readData(self, credentials, thing_uuid, **kwargs):
         url = self.__parseUrl(credentials) + '/data/' + thing_uuid + self.__queryParameter(kwargs)
         logging.info('GET ' + url)
