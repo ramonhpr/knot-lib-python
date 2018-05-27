@@ -1,6 +1,7 @@
 import requests
 import logging
 import json
+from uuid import UUID
 
 class ProtoHttp(object):
     def __parseUrl(self, credentials):
@@ -22,6 +23,10 @@ class ProtoHttp(object):
         url = self.__parseUrl(credentials) + '/devices'
         logging.info('POST ' + url)
         logging.info('json -> '+ str(user_data))
+        try: # validate if uuid is in the right format
+            UUID(credentials.get('uuid'), version=4)
+        except ValueError as err:
+            raise ValueError('Invalid credentials: ' + str(err))
         response = requests.post(url, json=user_data)
         logging.info('status_code -> ' + str(response.status_code))
         logging.info('response_json -> ' + str(response.json()))
