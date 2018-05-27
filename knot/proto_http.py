@@ -24,10 +24,10 @@ class ProtoHttp(object):
         response = requests.post(url, json=user_data)
         logging.info('status_code -> ' + str(response.status_code))
         logging.info('response_json -> ' + str(response.json()))
-        if response.status_code == 201:
+        try:
             return response.json()
-        elif response.status_code == 404:
-            raise Exception('Http Error')
+        except:
+            return response.text
 
     def unregisterDevice(self, credentials, user_data={}):
         url = self.__parseUrl(credentials) + '/devices/' + user_data.get('uuid')
@@ -35,12 +35,11 @@ class ProtoHttp(object):
         response = requests.delete(url, headers=self.__authHeaders(credentials))
         logging.info('status_code -> ' + str(response.status_code))
         logging.info('response_json -> ' + str(response.json()))
-        if response.status_code == 200:
+        try:
             return response.json()
-        elif response.status_code == 404:
-            raise Exception('Http Error')
-        else:
+        except:
             return response.text
+
     def myDevices(self, credentials, user_data={}):
         url = self.__parseUrl(credentials) + '/mydevices'
         logging.info('GET ' + url)
@@ -48,13 +47,9 @@ class ProtoHttp(object):
         response = requests.get(url, headers=self.__authHeaders(credentials))
         logging.info('status_code -> ' + str(response.status_code))
         logging.info('response_json -> ' + str(response.json()))
-        if response.status_code == 200:
+        try:
             return response.json()
-        elif response.status_code == 404:
-            raise Exception('Http Error')
-        elif response.status_code == 401:
-            return response.json()
-        else:
+        except:
             return response.text
 
     def readData(self, credentials, thing_uuid, **kwargs):
@@ -64,7 +59,10 @@ class ProtoHttp(object):
         response = requests.get(url, headers=self.__authHeaders(credentials), json=kwargs)
         logging.info('status_code -> ' + str(response.status_code))
         logging.info('response_json -> ' + str(response.json()))
-        return response.json()
+        try:
+            return response.json()
+        except:
+            return response.text
 
     def postData(self, credentials, user_data={}):
         url = self.__parseUrl(credentials) + '/data/' + user_data.get('uuid')
@@ -72,3 +70,7 @@ class ProtoHttp(object):
         logging.info('json -> '+ str(user_data))
         response = requests.post(url, headers=self.__authHeaders(credentials), json=user_data)
         logging.info('status_code -> ' + str(response.status_code))
+        try:
+            return response.json()
+        except:
+            return response.text

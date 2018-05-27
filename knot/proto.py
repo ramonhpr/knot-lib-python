@@ -22,8 +22,14 @@ class KnotProtocol(object):
 	def subscribe(self, credentials, uuid, onReceive=None):
 		self.protocol.subscribe(credentials, uuid, onReceive)
 
-	def update(self, credentials, user_data={}):
-		return self.protocol.update(credentials, user_data)
+	def update(self, credentials, uuid, user_data={}):
+		if not isinstance(uuid, str):
+			raise Exception('uuid is required')
+		if not uuid:
+			raise Exception('uuid is required')
+		properties = {'uuid': uuid}
+		properties.update(user_data)
+		return self.protocol.update(credentials, properties)
 
 	def readData(self, credentials, thing_uuid, **kwargs):
 		return self.protocol.readData(credentials, thing_uuid, **kwargs)

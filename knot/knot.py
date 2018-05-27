@@ -1,5 +1,6 @@
 from .proto import KnotProtocol
 from .evt_flag import EvtFlagsEnum
+from .handler import *
 
 class KnotConnection(object):
 	def __init__(self, protocol, credentials):
@@ -11,21 +12,17 @@ class KnotConnection(object):
 		return result
 
 	def unregisterDevice(self, user_data={}):
-		return self.protocol.unregisterDevice(self.credentials, user_data)
+		result = self.protocol.unregisterDevice(self.credentials, user_data)
+		return handleResponseError(result)
 
-	def update(self, user_data={}):
-		result = self.protocol.update(self.credentials, user_data)
-		return result
+	def update(self, uuid, user_data={}):
+		result = self.protocol.update(self.credentials, uuid, user_data)
+		return handleResponseError(result)
 
 	def myDevices(self):
 		result = self.protocol.myDevices(self.credentials)
-		if result.get('error'):
-			if isinstance(result.get('error'), dict): 
-				raise Exception(result.get('error').get('message'))
-			else:
-				raise Exception(result.get('error'))
-		else:
-			return result.get('devices')
+		devices = handleResponseError(result).get('devices')
+		return devices
 
 	def subscribe(self, uuid, onReceive=None):
 		self.protocol.subscribe(self.credentials, uuid, onReceive)
@@ -36,26 +33,26 @@ class KnotConnection(object):
 	# The bellow methods just use in specific protocols
 
 	def getThings(self):
-		result = self.protocol.getDevices(self.credentials)
-		if isinstance(result, dict) and result.get('Error'):
-			raise Exception(result.get('Error'))
-		else:
-			return result
+		result = self.protocol.getThings(self.credentials)
+		return handleResponseError(result)
 
 	def readData(self, thing_uuid, **kwargs): 
 		result = self.protocol.readData(self.credentials, thing_uuid, **kwargs)
-		if result.get('error'):
-			raise Exception(result.get('error'))
-		else:
-			return result.get('data')
+		data = handleResponseError(result).get('data')
+		return data
 
 	def setData(self, thing_uuid, sensor_id, value):
-		return self.protocol.setData(self.credentials, thing_uuid, sensor_id, value)
+		result = self.protocol.setData(self.credentials, thing_uuid, sensor_id, value)
+		return handleResponseError(result)
 
 	def getData(self, thing_uuid, sensor_id):
-		return self.protocol.getData(self.credentials, thing_uuid, sensor_id)
+		result = self.protocol.getData(self.credentials, thing_uuid, sensor_id)
+		data = handleResponseError(result)
+		return data
 
 	def setConfig(self, thing_uuid, sensor_id, eventFlags=8, timeSec=0,
 					 lowerLimit=0, upperLimit=0):
-		return self.protocol.setConfig(self.credentials, thing_uuid, sensor_id,
+		handleEvtFlagError(eventFlags, timeSec, lowerLimit, upperLimit)
+		result = self.protocol.setConfig(self.credentials, thing_uuid, sensor_id,
 									 eventFlags, timeSec, lowerLimit, upperLimit)
+		return handleResponseError(result)
