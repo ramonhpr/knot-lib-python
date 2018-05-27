@@ -8,6 +8,9 @@ class KnotProtocol(object):
 			'http': ProtoHttp()
 		}.get(protocol)
 
+	def __str__(self):
+		return 'http' if isinstance(self.protocol, ProtoHttp) else 'socketio'
+
 	def registerDevice(self, credentials, user_data={}):
 		properties = {'type':'KNoTDevice', 'owner': credentials['uuid']}
 		properties.update(user_data)
