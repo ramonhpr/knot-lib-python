@@ -82,7 +82,7 @@ class KNoTNamespace(BaseNamespace):
 	def on_notReady(self, *args):
 		logging.info('notReady')
 		logging.info(args)
-		raise Exception('Not valid credentials')
+		raise Exception('Invalid credentials')
 
 	def on_identify(self, *args):
 		logging.info('Identify')
@@ -101,8 +101,11 @@ class ProtoSocketio(object):
 		ProtoSocketio.methodArgs = properties
 		ProtoSocketio.methodCallBack = callback
 		ProtoSocketio.result = {}
-		with SocketIO(credentials['servername'], credentials['port'], KNoTNamespace, wait_for_connection=False) as socketIO:
-			socketIO.wait()
+		try:
+			with SocketIO(credentials.get('servername'), credentials.get('port'), KNoTNamespace, wait_for_connection=False) as socketIO:
+				socketIO.wait()
+		except AttributeError as err:
+			raise AttributeError('Connection not established, verify servername and port')
 		return ProtoSocketio.result
 
 	def myDevices(self, credentials):
