@@ -2,6 +2,7 @@ import requests
 import logging
 import json
 from uuid import UUID
+__all__=[]
 
 class ProtoHttp(object):
     def __parseUrl(self, credentials):

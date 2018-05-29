@@ -1,5 +1,6 @@
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
+__all__=[]
 
 class KnotProtocol(object):
 	def __init__(self, protocol):

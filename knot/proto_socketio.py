@@ -1,5 +1,6 @@
 from socketIO_client import SocketIO, BaseNamespace
 import logging
+__all__=[]
 
 class KNoTNamespace(BaseNamespace):
 	def on_connect(self, *args):

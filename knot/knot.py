@@ -1,7 +1,7 @@
 from .proto import KnotProtocol
 from .evt_flag import EvtFlagsEnum
 from .handler import *
-
+__all__ = ['KnotConnection']
 class KnotConnection(object):
 	def __init__(self, protocol, credentials):
 		self.protocol = KnotProtocol(protocol)
