@@ -1,7 +1,7 @@
 from .proto import KnotProtocol
-from .evt_flag import EvtFlagsEnum
 from .handler import *
 __all__ = ['KnotConnection']
+
 class KnotConnection(object):
 	def __init__(self, protocol, credentials):
 		self.protocol = KnotProtocol(protocol)
@@ -36,7 +36,7 @@ class KnotConnection(object):
 		result = self.protocol.getThings(self.credentials)
 		return handleResponseError(result)
 
-	def readData(self, thing_uuid, **kwargs): 
+	def readData(self, thing_uuid, **kwargs):
 		result = self.protocol.readData(self.credentials, thing_uuid, **kwargs)
 		data = handleResponseError(result).get('data')
 		return data
