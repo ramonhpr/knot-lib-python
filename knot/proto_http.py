@@ -13,10 +13,9 @@ class ProtoHttp(object):
             'meshblu_auth_token': credentials.get('token')
         }
     def __queryParameter(self, data):
-        ret = ''
+        ret = '?'
         logging.info(data)
         for key in data:
-            ret = ret + '?'
             ret = ret + key + '=' + str(data.get(key)) + '&'
         return ret
 
