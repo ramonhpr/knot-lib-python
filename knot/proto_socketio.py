@@ -38,6 +38,7 @@ class KNoTNamespace(BaseNamespace):
 
 	def on_register(self, *args):
 		logging.info('Registered')
+		logging.info(args[0])
 		ProtoSocketio.result = args[0]
 		self.disconnect()
 
@@ -66,6 +67,7 @@ class KNoTNamespace(BaseNamespace):
 
 	def on_ready(self, *args):
 		logging.info('Ready')
+		logging.info(args)
 		# The below 'switch' select which callback must be emitted
 		emit = {
 			'getDevices': lambda: self.emit('devices', ProtoSocketio.methodArgs, self.on_devices),
@@ -87,6 +89,7 @@ class KNoTNamespace(BaseNamespace):
 
 	def on_identify(self, *args):
 		logging.info('Identify')
+		logging.info(args)
 		self.emit('identity', ProtoSocketio.cred)
 
 class ProtoSocketio(object):
