@@ -9,7 +9,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name = "knot",
+    name = "knotpy",
     version = "1.0",
     author = "Ramon Ribeiro",
     author_email = "rhpr@cesar.org.br",
@@ -18,7 +18,7 @@ setup(
     keywords = "IoT dataAnalytics API web",
     url = "https://github.com/ramonhpr/knot-python-api",
     install_requires=['socketIO_client'],
-    packages=['knot'],
+    packages=['knotpy'],
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 3 - Alpha",
