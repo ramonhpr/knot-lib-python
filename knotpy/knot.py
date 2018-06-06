@@ -1,5 +1,6 @@
 from .proto import KnotProtocol
 from .handler import *
+from .evt_flag import *
 __all__ = ['KnotConnection']
 
 class KnotConnection(object):
@@ -98,7 +99,7 @@ class KnotConnection(object):
 		data = handleResponseError(result)
 		return data
 
-	def sendConfig(self, thing_uuid, sensor_id, eventFlags=8, timeSec=0,
+	def sendConfig(self, thing_uuid, sensor_id, eventFlags=FLAG_CHANGE, timeSec=0,
 					 lowerLimit=0, upperLimit=0):
 		'''
 		Send configuration from the sensor of your thing if it is online
