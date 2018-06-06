@@ -57,16 +57,7 @@ class KnotConnection(object):
 		'''
 		return self.protocol.postData(self.credentials, thing_uuid, user_data)
 
-	# The bellow methods just use in specific protocols
-
-	def getThings(self):
-		'''
-		Get the things of your user
-		'''
-		result = self.protocol.getThings(self.credentials)
-		return handleResponseError(result)
-
-	def readData(self, thing_uuid, **kwargs):
+	def getData(self, thing_uuid, **kwargs):
 		'''
 		Get thing data from cloud and
 		return a list of dict/json with your data
@@ -83,6 +74,15 @@ class KnotConnection(object):
 		data = handleResponseError(result).get('data')
 		return data
 
+	# The bellow methods just use in specific protocols
+
+	def getThings(self):
+		'''
+		Get the things of your user
+		'''
+		result = self.protocol.getThings(self.credentials)
+		return handleResponseError(result)
+
 	def setData(self, thing_uuid, sensor_id, value):
 		'''
 		Set data of the sensor from your thing
@@ -90,7 +90,7 @@ class KnotConnection(object):
 		result = self.protocol.setData(self.credentials, thing_uuid, sensor_id, value)
 		return handleResponseError(result)
 
-	def getData(self, thing_uuid, sensor_id):
+	def sendGetData(self, thing_uuid, sensor_id):
 		'''
 		Force your thing to post sensor data indepent of your configuration
 		'''
@@ -98,7 +98,7 @@ class KnotConnection(object):
 		data = handleResponseError(result)
 		return data
 
-	def setConfig(self, thing_uuid, sensor_id, eventFlags=8, timeSec=0,
+	def sendConfig(self, thing_uuid, sensor_id, eventFlags=8, timeSec=0,
 					 lowerLimit=0, upperLimit=0):
 		'''
 		Send configuration from the sensor of your thing if it is online
