@@ -51,6 +51,7 @@ class KNoTNamespace(BaseNamespace):
 	def on_update(self, *args):
 		logging.info('Update')
 		logging.info(args[0])
+		ProtoSocketio.result = args[0]
 		self.disconnect()
 
 	def on_data(self, *args):
