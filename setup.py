@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "knotpy",
-    version = "1.0",
+    version = "1.1",
     author = "Ramon Ribeiro",
     author_email = "rhpr@cesar.org.br",
     description = ("API to access data from knot devices"),
@@ -21,7 +21,7 @@ setup(
     packages=['knotpy'],
     long_description=read('README.md'),
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Topic :: Utilities",
         "License :: OSI Approved :: BSD License",
     ],
