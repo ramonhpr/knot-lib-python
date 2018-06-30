@@ -8,7 +8,7 @@ for thing in myThings:
 	print(thing)
 	print(60*'-')
 	print('DATA')
-	data = conn.readData(thing['uuid'], limit=1)
+	data = conn.getData(thing['uuid'], limit=1)
 	print data
 	'''print('Set data')
 	if thing.get('schema'):
