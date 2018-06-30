@@ -6,7 +6,7 @@
 
 ```s
 $ sudo pip install virtualenv
-$ virtualenv ~/env_name
+$ virtualenv ~/envname
 $ . ~/envname/bin/activate
 $ pip install .
 ```
@@ -54,7 +54,6 @@ class KnotConnection(__builtin__.object)
      |              - start: the start date that you want your set of data
      |              - finish: the finish date that you want your set of data
      |      Examples:
-     |      conn.getData(thing_uuid, limit=20, start='yesterday') # get 20 first data from yesterday
      |      conn.getData(thing_uuid, limit=1) # get most recent data from your sensor
      |      conn.getData(thing_uuid, finish='2018/03/15') # get data the 10 data from until this date
      |
