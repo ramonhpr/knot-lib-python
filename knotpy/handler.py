@@ -1,4 +1,6 @@
 from .evt_flag import *
+import re
+base64Pattern= re.compile('(?:[A-Za-z0-9+/]{4}){1,}(?:[A-Za-z0-9+/]{2}[AEIMQUYcgkosw048]=|[A-Za-z0-9+/][AQgw]==)')
 
 def handleEvtFlagError(flags, timeSec, lowerLimit, upperLimit):
 	if FLAG_TIME&flags and not timeSec:
@@ -23,3 +25,13 @@ def handleResponseError(res):
 			return res
 	else:
 		return res
+def handleRequestSetDataValue(value):
+	if isinstance(value, str) and isBase64(value):
+		return
+	elif isinstance(value, int) or isinstance(value, float) or \
+		isinstance(value, bool):
+		return
+	else:
+		raise TypeError('Value must be string in base 64, number or bool')
+def isBase64(s):
+	return re.match(base64Pattern, s) != None

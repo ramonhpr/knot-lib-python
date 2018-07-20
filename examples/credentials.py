@@ -1,6 +1,6 @@
 credentials = {
-	'uuid': '533703c2-b60c-45c9-bc6b-1f7301ba0000',
-	'token': '6ab7f76b86d1cf6a29f40ff1a1b053dec3e9d24c',
-	'servername': 'localhost',
+	'uuid': 'a30de928-2ab5-4c1c-9c11-a46fec3e0000',
+	'token': 'c63aae9e3f4e30002975df783e8185ccd841df5e',
+	'servername': 'knot-test.cesar.org.br',
 	'port': 3000
 }

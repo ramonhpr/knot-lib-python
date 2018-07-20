@@ -88,6 +88,7 @@ class KnotConnection(object):
 		'''
 		Set data of the sensor from your thing
 		'''
+		handleRequestSetDataValue(value)
 		result = self.protocol.setData(self.credentials, thing_uuid, sensor_id, value)
 		return handleResponseError(result)
 
