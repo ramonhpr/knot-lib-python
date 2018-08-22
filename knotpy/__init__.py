@@ -38,4 +38,6 @@ __flag_list = [
 __all__ = ['KnotConnection'] +__flag_list
 __version__ = 1.1
 if _os.environ.get('DEBUG'):
-	_logging.basicConfig(format='KNOT_DEBUG: %(message)s', stream=_sys.stderr, level=_logging.INFO)
+	_logging.basicConfig(format='On file: %(pathname)s\n[%(levelname)s] %(funcName)s: %(message)s\n', stream=_sys.stderr, level=_logging.DEBUG)
+elif _os.environ.get('INFO'):
+	_logging.basicConfig(format='[%(levelname)s] %(funcName)s: %(message)s\n', stream=_sys.stderr, level=_logging.INFO)

@@ -1,6 +1,6 @@
-# KNoT python API
+# KNoT lib python
 
-### Use meshblu API to access devices data
+### Use meshblu API to access devices data in KNoT platform
 
 ## How to install
 
@@ -101,3 +101,9 @@ class KnotConnection(__builtin__.object)
      |
 
 ```
+
+# LOG LEVEL
+You can enable two log levels in knotpy, INFO and DEBUG, by adding a environment
+variable. In INFO log you can
+enable messages in the package knotpy. And in DEBUG log you can also see the
+log levels in the other dependencies packages.
