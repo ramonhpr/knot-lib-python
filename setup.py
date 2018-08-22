@@ -16,7 +16,7 @@ setup(
     description = ("API to access data from knot devices"),
     license = "BSD",
     keywords = "IoT dataAnalytics API web",
-    url = "https://github.com/ramonhpr/knot-python-api",
+    url = "https://github.com/ramonhpr/knot-lib-python",
     install_requires=['socketIO_client'],
     packages=['knotpy'],
     long_description=read('README.md'),
