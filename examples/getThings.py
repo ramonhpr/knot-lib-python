@@ -9,7 +9,7 @@ for thing in myThings:
 	print(60*'-')
 	print('DATA')
 	data = conn.getData(thing['uuid'], limit=1)
-	print data
+	print(data)
 	'''print('Set data')
 	if thing.get('schema'):
 		for sensor in thing.get('schema'):
