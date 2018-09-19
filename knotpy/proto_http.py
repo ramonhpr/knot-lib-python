@@ -82,7 +82,7 @@ class ProtoHttp(object):
             logging.info('response_text-> ' + str(response.text))
             return response.text
 
-    def readData(self, credentials, thing_uuid, **kwargs):
+    def getData(self, credentials, thing_uuid, **kwargs):
         url = self.__parseUrl(credentials) + '/data/' + thing_uuid + self.__queryParameter(kwargs)
         logging.info('GET ' + url)
         logging.info('json -> '+ str(kwargs))

@@ -71,7 +71,7 @@ class KnotConnection(object):
 		conn.getData(thing_uuid, limit=1) # get most recent data from your sensor
 		conn.getData(thing_uuid, finish='2018/03/15') # get data the 10 data from until this date
 		'''
-		result = self.protocol.readData(self.credentials, thing_uuid, **kwargs)
+		result = self.protocol.getData(self.credentials, thing_uuid, **kwargs)
 		data = handleResponseError(result).get('data')
 		return data
 
@@ -91,11 +91,11 @@ class KnotConnection(object):
 		result = self.protocol.setData(self.credentials, thing_uuid, sensor_id, value)
 		return handleResponseError(result)
 
-	def sendGetData(self, thing_uuid, sensor_id):
+	def requestData(self, thing_uuid, sensor_id):
 		'''
 		Force your thing to post sensor data indepent of your configuration
 		'''
-		result = self.protocol.getData(self.credentials, thing_uuid, sensor_id)
+		result = self.protocol.requestData(self.credentials, thing_uuid, sensor_id)
 		data = handleResponseError(result)
 		return data
 

@@ -134,7 +134,7 @@ class ProtoSocketio(object):
 	def postData(self, credentials, user_data={}):
 		return self.__signinEmit(credentials, 'data', user_data)
 
-	def readData(self, credentials, uuid, **kwargs):
+	def getData(self, credentials, uuid, **kwargs):
 		kwargs.update({
 			'uuid': credentials.get('uuid'),
 			'token': credentials.get('token'),

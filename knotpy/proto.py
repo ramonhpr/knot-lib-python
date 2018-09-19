@@ -35,8 +35,8 @@ class KnotProtocol(object):
 		properties.update(user_data)
 		return self.protocol.update(credentials, properties)
 
-	def readData(self, credentials, thing_uuid, **kwargs):
-		return self.protocol.readData(credentials, thing_uuid, **kwargs)
+	def getData(self, credentials, thing_uuid, **kwargs):
+		return self.protocol.getData(credentials, thing_uuid, **kwargs)
 
 	def postData(self, credentials, thing_uuid, user_data={}):
 		properties = {'uuid': thing_uuid}
@@ -59,7 +59,7 @@ class KnotProtocol(object):
 		}
 		return ProtoSocketio().update(credentials, properties)
 
-	def getData(self, credentials, thing_uuid, sensor_id):
+	def requestData(self, credentials, thing_uuid, sensor_id):
 		properties = {
 			'uuid': thing_uuid,
 			'get_data': [{
