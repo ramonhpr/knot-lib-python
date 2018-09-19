@@ -43,8 +43,7 @@ class KnotConnection(object):
 			If you run it in the fog it returns all the devices of your gateway
 		'''
 		result = self.protocol.myDevices(self.credentials)
-		devices = handleResponseError(result).get('devices')
-		return devices
+		return handleResponseError(result)
 
 	def subscribe(self, uuid, onReceive=None):
 		'''

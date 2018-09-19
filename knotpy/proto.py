@@ -2,6 +2,28 @@ from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
 __all__=[]
 
+def _omit(json, arr):
+	return {k: v for k,v in json.items() if k not in arr}
+
+def omitDeviceParameters(device):
+	return _omit(device,['_id',
+	'owner',
+	'type',
+	'ipAddress',
+	'token',
+	'meshblu',
+	'discoverWhitelist',
+	'configureWhitelist',
+	'socketid',
+	'secure',
+	'get_data',
+	'set_data'])
+
+def omitDevicesParameters(devices):
+	for i,dev in enumerate(devices):
+		devices[i] = omitDeviceParameters(dev)
+	return devices
+
 class KnotProtocol(object):
 	def __init__(self, protocol):
 		self.protocol = {
@@ -21,7 +43,7 @@ class KnotProtocol(object):
 		return self.protocol.unregisterDevice(credentials, user_data)
 
 	def myDevices(self, credentials):
-		return self.protocol.myDevices(credentials)
+		return omitDevicesParameters(self.protocol.myDevices(credentials).get('devices'))
 
 	def subscribe(self, credentials, uuid, onReceive=None):
 		self.protocol.subscribe(credentials, uuid, onReceive)
@@ -47,7 +69,7 @@ class KnotProtocol(object):
 		properties = {
 			'gateways': gateways
 		}
-		return ProtoSocketio().getDevices(credentials, properties)
+		return omitDevicesParameters(ProtoSocketio().getDevices(credentials, properties))
 
 	def setData(self, credentials, thing_uuid, sensor_id, value):
 		properties = {
