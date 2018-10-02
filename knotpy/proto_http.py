@@ -38,6 +38,7 @@ class ProtoHttp(object):
     def unregisterDevice(self, credentials, user_data={}):
         url = self.__parseUrl(credentials) + '/devices/' + user_data.get('uuid')
         logging.info('DELETE ' + url)
+        logging.info('Headers ' + str(self.__authHeaders(credentials)))
         response = requests.delete(url, headers=self.__authHeaders(credentials))
         logging.info('status_code -> ' + str(response.status_code))
         logging.info('response_json -> ' + str(response.json()))
@@ -49,6 +50,7 @@ class ProtoHttp(object):
     def myDevices(self, credentials, user_data={}):
         url = self.__parseUrl(credentials) + '/mydevices'
         logging.info('GET ' + url)
+        logging.info('Headers ' + str(self.__authHeaders(credentials)))
         logging.info('json -> '+ str(user_data))
         response = requests.get(url, headers=self.__authHeaders(credentials))
         logging.info('status_code -> ' + str(response.status_code))
@@ -61,6 +63,7 @@ class ProtoHttp(object):
     def subscribe(self, credentials, uuid, onReceive=None):
         url = self.__parseUrl(credentials) + '/subscribe/' + uuid
         logging.info('GET ' + url)
+        logging.info('Headers ' + str(self.__authHeaders(credentials)))
         with requests.get(url, headers=self.__authHeaders(credentials), stream=True) as response:
             logging.info('status_code -> ' + str(response.status_code))
             for line in response.iter_lines():
@@ -72,6 +75,7 @@ class ProtoHttp(object):
     def update(self, credentials, user_data={}):
         url = self.__parseUrl(credentials) + '/devices/' + user_data.get('uuid')
         logging.info('GET ' + url)
+        logging.info('Headers ' + str(self.__authHeaders(credentials)))
         logging.info('json -> ' + str(user_data))
         response = requests.put(url, headers=self.__authHeaders(credentials), json=user_data)
         logging.info('status_code -> ' + str(response.status_code))
@@ -85,6 +89,7 @@ class ProtoHttp(object):
     def getData(self, credentials, thing_uuid, **kwargs):
         url = self.__parseUrl(credentials) + '/data/' + thing_uuid + self.__queryParameter(kwargs)
         logging.info('GET ' + url)
+        logging.info('Headers ' + str(self.__authHeaders(credentials)))
         logging.info('json -> '+ str(kwargs))
         response = requests.get(url, headers=self.__authHeaders(credentials), json=kwargs)
         logging.info('status_code -> ' + str(response.status_code))
@@ -97,6 +102,7 @@ class ProtoHttp(object):
     def postData(self, credentials, user_data={}):
         url = self.__parseUrl(credentials) + '/data/' + user_data.get('uuid')
         logging.info('POST ' + url)
+        logging.info('Headers ' + str(self.__authHeaders(credentials)))
         logging.info('json -> '+ str(user_data))
         response = requests.post(url, headers=self.__authHeaders(credentials), json=user_data)
         logging.info('status_code -> ' + str(response.status_code))
