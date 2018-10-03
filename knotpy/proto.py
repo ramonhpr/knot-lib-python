@@ -68,12 +68,14 @@ class KnotProtocol(object):
 		return self.protocol.postData(credentials, properties)
 
 	def getThings(self, credentials, gateways=['*']):
+		logging.warn('This function is using protocol socketio')
 		properties = {
 			'gateways': gateways
 		}
 		return omitDevicesParameters(ProtoSocketio().getDevices(credentials, properties))
 
 	def setData(self, credentials, thing_uuid, sensor_id, value):
+		logging.warn('This function is using protocol socketio')
 		properties = {
 			'uuid': thing_uuid,
 			'set_data': [{
@@ -84,6 +86,7 @@ class KnotProtocol(object):
 		return ProtoSocketio().update(credentials, properties)
 
 	def requestData(self, credentials, thing_uuid, sensor_id):
+		logging.warn('This function is using protocol socketio')
 		properties = {
 			'uuid': thing_uuid,
 			'get_data': [{
@@ -93,6 +96,7 @@ class KnotProtocol(object):
 		return ProtoSocketio().update(credentials, properties)
 
 	def setConfig(self, credentials, thing_uuid, sensor_id, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
+		logging.warn('This function is using protocol socketio')
 		properties = {
 			'uuid': thing_uuid,
 			'config': [{
