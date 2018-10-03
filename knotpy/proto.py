@@ -39,10 +39,10 @@ class KnotProtocol(object):
 	def registerDevice(self, credentials, user_data={}):
 		properties = {'type':'KNoTDevice', 'owner': credentials['uuid']}
 		properties.update(user_data)
-		return self.protocol.registerDevice(credentials, properties)
+		return omitDeviceParameters(self.protocol.registerDevice(credentials, properties))
 
 	def unregisterDevice(self, credentials,user_data={}):
-		return self.protocol.unregisterDevice(credentials, user_data)
+		return omitDeviceParameters(self.protocol.unregisterDevice(credentials, user_data))
 
 	def myDevices(self, credentials):
 		return omitDevicesParameters(self.protocol.myDevices(credentials).get('devices'))
@@ -57,7 +57,7 @@ class KnotProtocol(object):
 			raise Exception('uuid is required')
 		properties = {'uuid': uuid}
 		properties.update(user_data)
-		return self.protocol.update(credentials, properties)
+		return omitDeviceParameters(self.protocol.update(credentials, properties))
 
 	def getData(self, credentials, thing_uuid, **kwargs):
 		return self.protocol.getData(credentials, thing_uuid, **kwargs)
@@ -83,7 +83,7 @@ class KnotProtocol(object):
 				'value': value
 				}]
 		}
-		return ProtoSocketio().update(credentials, properties)
+		return omitDeviceParameters(ProtoSocketio().update(credentials, properties))
 
 	def requestData(self, credentials, thing_uuid, sensor_id):
 		logging.warn('This function is using protocol socketio')
@@ -93,7 +93,7 @@ class KnotProtocol(object):
 				'sensor_id': sensor_id
 				}]
 		}
-		return ProtoSocketio().update(credentials, properties)
+		return omitDeviceParameters(ProtoSocketio().update(credentials, properties))
 
 	def setConfig(self, credentials, thing_uuid, sensor_id, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
 		logging.warn('This function is using protocol socketio')
@@ -107,4 +107,4 @@ class KnotProtocol(object):
 				'upper_limit': upperLimit
 				}]
 		}
-		return ProtoSocketio().update(credentials, properties)
+		return omitDeviceParameters(ProtoSocketio().update(credentials, properties))
