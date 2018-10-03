@@ -16,7 +16,7 @@ See an example:
 	'uuid': <user_uuid>,
 	'token': <user_token>
 }
-> conn = KnotConnection('http', credentials)
+> conn = KnotConnection(credentials, protocol='http')
 > myThings = conn.getThings()
 
 `myThings` is an array with the things that is online and offline in your gateway

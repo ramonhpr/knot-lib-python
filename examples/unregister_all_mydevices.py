@@ -1,7 +1,7 @@
 from knotpy import *
 from credentials import *
 
-knot = KnotConnection('socketio',credentials)
+knot = KnotConnection(credentials)
 try:
 	devices = knot.myDevices()
 	print('Getting mydevices')

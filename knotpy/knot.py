@@ -1,14 +1,14 @@
-from .proto import KnotProtocol
+from .cloud_factory import CloudFactory
 from .handler import *
 from .evt_flag import *
 __all__ = ['KnotConnection']
 
 class KnotConnection(object):
 	'''This is the main class to connect to KNoT Cloud
-	KnotConnection(protocol, credentials)
+	KnotConnection(credentials, protocol='http')
 	'''
-	def __init__(self, protocol, credentials):
-		self.protocol = KnotProtocol(protocol)
+	def __init__(self, credentials, cloud='MESHBLU', protocol='socketio'):
+		self.cloud = CloudFactory.init(cloud, protocol)
 		self.credentials = credentials
 
 	def registerDevice(self, user_data={}):
@@ -16,7 +16,7 @@ class KnotConnection(object):
 		Register a device in the cloud with owner credentials
 		and return a dict/json with the device added
 		'''
-		result = self.protocol.registerDevice(self.credentials, user_data)
+		result = self.cloud.registerDevice(self.credentials, user_data)
 		return result
 
 	def unregisterDevice(self, user_data={}):
@@ -24,7 +24,7 @@ class KnotConnection(object):
 		Unregister a device with the credentials passed by the dict/json
 		parameter and return the successed json message
 		'''
-		result = self.protocol.unregisterDevice(self.credentials, user_data)
+		result = self.cloud.unregisterDevice(self.credentials, user_data)
 		return handleResponseError(result)
 
 	def update(self, uuid, user_data={}):
@@ -32,7 +32,7 @@ class KnotConnection(object):
 		Update a device with the credentials passed by the dict/json
 		parameter and return the successed json message
 		'''
-		result = self.protocol.update(self.credentials, uuid, user_data)
+		result = self.cloud.update(self.credentials, uuid, user_data)
 		return handleResponseError(result)
 
 	def myDevices(self):
@@ -42,20 +42,20 @@ class KnotConnection(object):
 			If you run it in the cloud it returns the gateway device
 			If you run it in the fog it returns all the devices of your gateway
 		'''
-		result = self.protocol.myDevices(self.credentials)
+		result = self.cloud.myDevices(self.credentials)
 		return handleResponseError(result)
 
 	def subscribe(self, uuid, onReceive=None):
 		'''
 		Subscribe the device to monitor changes on it
 		'''
-		self.protocol.subscribe(self.credentials, uuid, onReceive)
+		self.cloud.subscribe(self.credentials, uuid, onReceive)
 
 	def postData(self, thing_uuid, user_data={}):
 		'''
 		Post the json passed in user_data to the cloud
 		'''
-		return self.protocol.postData(self.credentials, thing_uuid, user_data)
+		return self.cloud.postData(self.credentials, thing_uuid, user_data)
 
 	def getData(self, thing_uuid, **kwargs):
 		'''
@@ -70,7 +70,7 @@ class KnotConnection(object):
 		conn.getData(thing_uuid, limit=1) # get most recent data from your sensor
 		conn.getData(thing_uuid, finish='2018/03/15') # get data the 10 data from until this date
 		'''
-		result = self.protocol.getData(self.credentials, thing_uuid, **kwargs)
+		result = self.cloud.getData(self.credentials, thing_uuid, **kwargs)
 		data = handleResponseError(result).get('data')
 		return data
 
@@ -80,21 +80,21 @@ class KnotConnection(object):
 		'''
 		Get the things of your user
 		'''
-		result = self.protocol.getThings(self.credentials)
+		result = self.cloud.getThings(self.credentials)
 		return handleResponseError(result)
 
 	def setData(self, thing_uuid, sensor_id, value):
 		'''
 		Set data of the sensor from your thing
 		'''
-		result = self.protocol.setData(self.credentials, thing_uuid, sensor_id, value)
+		result = self.cloud.setData(self.credentials, thing_uuid, sensor_id, value)
 		return handleResponseError(result)
 
 	def requestData(self, thing_uuid, sensor_id):
 		'''
 		Force your thing to post sensor data indepent of your configuration
 		'''
-		result = self.protocol.requestData(self.credentials, thing_uuid, sensor_id)
+		result = self.cloud.requestData(self.credentials, thing_uuid, sensor_id)
 		data = handleResponseError(result)
 		return data
 
@@ -110,6 +110,6 @@ class KnotConnection(object):
 		FLAG_MAX
 		'''
 		handleEvtFlagError(eventFlags, timeSec, lowerLimit, upperLimit)
-		result = self.protocol.setConfig(self.credentials, thing_uuid, sensor_id,
+		result = self.cloud.setConfig(self.credentials, thing_uuid, sensor_id,
 									 eventFlags, timeSec, lowerLimit, upperLimit)
 		return handleResponseError(result)

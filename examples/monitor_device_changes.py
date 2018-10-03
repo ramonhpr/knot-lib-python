@@ -1,7 +1,7 @@
 from knotpy import *
 from credentials import *
 
-knot = KnotConnection('socketio', credentials)
+knot = KnotConnection(credentials)
 def onDeviceChange(device):
     print(device)
 try:

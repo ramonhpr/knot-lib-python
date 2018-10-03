@@ -28,7 +28,7 @@ $ pip install .
             'uuid': <user_uuid>,
             'token': <user_token>
     }
-    > conn = KnotConnection('http', credentials)
+    > conn = KnotConnection(credentials, protocol='http')
     > myThings = conn.getThings()
 
     `myThings` is an array with the things that is online and offline in your gateway
@@ -44,7 +44,7 @@ class KnotConnection(__builtin__.object)
      |
      |  Methods defined here:
      |
-     |  __init__(self, protocol, credentials)
+     |  __init__(self, credentials, cloud='MESHBLU', protocol='socketio')
      |
      |  getData(self, thing_uuid, **kwargs)
      |      Get thing data from cloud and

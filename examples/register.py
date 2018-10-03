@@ -1,7 +1,7 @@
 from knotpy import *
 from credentials import *
 
-knot = KnotConnection('http',credentials)
+knot = KnotConnection(credentials, protocol='http')
 try:
     device = knot.registerDevice()
     print(device.get('uuid'))
