@@ -1,5 +1,6 @@
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
+import logging
 __all__=[]
 
 def _omit(json, arr):
@@ -26,6 +27,7 @@ def omitDevicesParameters(devices):
 
 class KnotProtocol(object):
 	def __init__(self, protocol):
+		logging.info('Using protocol '+ protocol)
 		self.protocol = {
 			'socketio': ProtoSocketio(),
 			'http': ProtoHttp()
