@@ -1,10 +1,10 @@
 import logging
-from .proto import KnotProtocol
+from .Meshblu import Meshblu
 
 class CloudFactory(object):
 	@staticmethod
 	def init(platform, protocol):
 		logging.info('Selecting cloud ' + platform)
 		return {
-			'MESHBLU': KnotProtocol(protocol),
-		}.get(platform)
+			'MESHBLU': Meshblu(protocol),
+		}.get(platform.upper())

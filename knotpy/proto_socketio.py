@@ -111,6 +111,8 @@ class ProtoSocketio(object):
 				socketIO.wait()
 		except AttributeError as err:
 			raise AttributeError('Connection not established, verify servername and port')
+		except KeyboardInterrupt:
+			pass
 		return ProtoSocketio.result
 
 	def myDevices(self, credentials):
@@ -128,7 +130,7 @@ class ProtoSocketio(object):
 	def subscribe(self, credentials, uuid, user_callback):
 		return self.__signinEmit(credentials, 'subscribe', {'uuid': uuid}, lambda socket, result: user_callback(result))
 
-	def update(self, credentials, properties={}):
+	def update(self, credentials, id, properties={}):
 		return self.__signinEmit(credentials, 'update', properties)
 
 	def postData(self, credentials, user_data={}):

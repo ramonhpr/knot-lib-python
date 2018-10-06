@@ -1,6 +1,7 @@
+import logging
+from uuid import UUID
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
-import logging
 __all__=[]
 
 def _omit(json, arr):
@@ -25,24 +26,59 @@ def omitDevicesParameters(devices):
 		devices[i] = omitDeviceParameters(dev)
 	return devices
 
-class KnotProtocol(object):
+def authHttpHeaders(credentials):
+	return {
+		'meshblu_auth_uuid': credentials.get('uuid'),
+		'meshblu_auth_token': credentials.get('token')
+	}
+
+def addDevice():
+	return {'type': 'POST', 'endpoint':'/devices'}
+
+def rmDevice(uuid):
+	return {'type': 'DELETE', 'endpoint':'/devices/%s' %uuid}
+
+def listDevice():
+	return {'type': 'GET', 'endpoint':'/mydevices'}
+
+def updateDevice(uuid):
+	return {'type': 'PUT', 'endpoint':'/devices/%s' %uuid}
+
+def listData(uuid):
+	return {'type': 'GET', 'endpoint': '/data/%s' %uuid}
+
+def addData(uuid):
+	return {'type': 'POST', 'endpoint': '/data/%s' %uuid}
+
+def subs(uuid):
+	return {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid}
+
+class Meshblu(object):
 	def __init__(self, protocol):
-		logging.info('Using protocol '+ protocol)
+		logging.info('Using protocol ' + protocol)
 		self.protocol = {
 			'socketio': ProtoSocketio(),
-			'http': ProtoHttp()
-		}.get(protocol)
-
-	def __str__(self):
-		return 'http' if isinstance(self.protocol, ProtoHttp) else 'socketio'
+			'http': ProtoHttp(headers=authHttpHeaders,
+							addDev=addDevice,
+							rmDev=rmDevice,
+							listDev=listDevice,
+							updateDev=updateDevice,
+							addData=addData,
+							listData=listData,
+							subs=subs)
+		}.get(protocol.lower())
 
 	def registerDevice(self, credentials, user_data={}):
 		properties = {'type':'KNoTDevice', 'owner': credentials['uuid']}
 		properties.update(user_data)
+		try: # validate if uuid is in the right format
+			UUID(credentials.get('uuid'), version=4)
+		except ValueError as err:
+			raise ValueError('Invalid credentials: ' + str(err))
 		return omitDeviceParameters(self.protocol.registerDevice(credentials, properties))
 
-	def unregisterDevice(self, credentials,user_data={}):
-		return omitDeviceParameters(self.protocol.unregisterDevice(credentials, user_data))
+	def unregisterDevice(self, credentials, uuid, user_data={}):
+		return omitDeviceParameters(self.protocol.unregisterDevice(credentials, uuid, user_data))
 
 	def myDevices(self, credentials):
 		return omitDevicesParameters(self.protocol.myDevices(credentials).get('devices'))
@@ -57,7 +93,7 @@ class KnotProtocol(object):
 			raise Exception('uuid is required')
 		properties = {'uuid': uuid}
 		properties.update(user_data)
-		return omitDeviceParameters(self.protocol.update(credentials, properties))
+		return omitDeviceParameters(self.protocol.update(credentials, uuid, properties))
 
 	def getData(self, credentials, thing_uuid, **kwargs):
 		return self.protocol.getData(credentials, thing_uuid, **kwargs)
@@ -65,7 +101,7 @@ class KnotProtocol(object):
 	def postData(self, credentials, thing_uuid, user_data={}):
 		properties = {'uuid': thing_uuid}
 		properties.update(user_data)
-		return self.protocol.postData(credentials, properties)
+		return self.protocol.postData(credentials, thing_uuid, properties)
 
 	def getThings(self, credentials, gateways=['*']):
 		logging.warn('This function is using protocol socketio')
