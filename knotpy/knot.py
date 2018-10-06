@@ -19,12 +19,12 @@ class KnotConnection(object):
 		result = self.cloud.registerDevice(self.credentials, user_data)
 		return result
 
-	def unregisterDevice(self, user_data={}):
+	def unregisterDevice(self, uuid, user_data={}):
 		'''
 		Unregister a device with the credentials passed by the dict/json
 		parameter and return the successed json message
 		'''
-		result = self.cloud.unregisterDevice(self.credentials, user_data)
+		result = self.cloud.unregisterDevice(self.credentials, uuid, user_data)
 		return handleResponseError(result)
 
 	def update(self, uuid, user_data={}):

@@ -1,7 +1,7 @@
 from knotpy import *
 from credentials import *
 
-knot = KnotConnection(credentials)
+knot = KnotConnection(credentials, protocol='http')
 try:
 	devices = knot.myDevices()
 	print('Getting mydevices')
@@ -13,6 +13,6 @@ try:
 			print(dev.get('id'))
 			print(dev.get('online'))
 			print(''),
-			knot.unregisterDevice(dev)
+			knot.unregisterDevice(dev['uuid'])
 except Exception as err:
 	print('[ERR]: '+str(err))
