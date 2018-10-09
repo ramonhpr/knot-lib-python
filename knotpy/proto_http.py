@@ -38,9 +38,17 @@ class ProtoHttp(Protocol):
 			if stream:
 				return response
 		elif typeReq == 'PUT':
-			response = requests.put(url, headers=headers, json=body)
+			if body:
+				response = requests.put(url, headers=headers, json=body)
+			else:
+				response = requests.put(url, headers=headers)
+
 		elif typeReq == 'DELETE':
-			response = requests.delete(url, headers=headers, json=body)
+			if body:
+				response = requests.delete(url, headers=headers, json=body)
+			else:
+				response = requests.delete(url, headers=headers)
+
 		logging.info('status_code -> ' + str(response.status_code))
 
 		try:
@@ -93,4 +101,3 @@ class ProtoHttp(Protocol):
 		url = self.__parseUrl(credentials) + self.addData(device_id)['endpoint']
 		typeReq = self.addData(device_id)['type'].upper()
 		return self.__doRequest(self.cloudHeaders(credentials), url, typeReq, user_data)
-

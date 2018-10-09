@@ -3,6 +3,7 @@ from uuid import UUID
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
 from .handler import handleResponseError
+from .Cloud import Cloud
 __all__=[]
 
 def _omit(json, arr):
@@ -67,7 +68,7 @@ def addData(uuid):
 def subs(uuid):
 	return {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid}
 
-class Meshblu(object):
+class Meshblu(Cloud):
 	def __init__(self, protocol):
 		logging.info('Using protocol ' + protocol)
 		self.protocol = {

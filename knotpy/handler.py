@@ -31,3 +31,12 @@ def handleResponseError(res):
 			return res
 	else:
 		return res
+
+def handleFiwareResponse(response):
+	if response:
+		if response[0].get('statusCode').get('code') == '200':
+			return response[0].get('contextElement')
+		elif response.get('errorCode'):
+			raise Exception(response.get('errorCode').get('reasonPhrase'))
+		else:
+			raise Exception(response[0].get('statusCode').get('reasonPhrase'))
