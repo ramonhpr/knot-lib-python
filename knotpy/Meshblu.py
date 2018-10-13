@@ -22,6 +22,19 @@ def omitDeviceParameters(device):
 	'get_data',
 	'set_data'])
 
+def omitDeviceRegisteredParameters(device):
+	return _omit(device,['_id',
+	'owner',
+	'type',
+	'ipAddress',
+	'meshblu',
+	'discoverWhitelist',
+	'configureWhitelist',
+	'socketid',
+	'secure',
+	'get_data',
+	'set_data'])
+
 def omitDevicesParameters(devices):
 	for i,dev in enumerate(devices):
 		devices[i] = omitDeviceParameters(dev)
@@ -76,7 +89,7 @@ class Meshblu(Cloud):
 			UUID(credentials.get('uuid'), version=4)
 		except ValueError as err:
 			raise ValueError('Invalid credentials: ' + str(err))
-		return omitDeviceParameters(self.protocol.registerDevice(credentials, properties))
+		return omitDeviceRegisteredParameters(self.protocol.registerDevice(credentials, properties))
 
 	def unregisterDevice(self, credentials, uuid, user_data={}):
 		return omitDeviceParameters(self.protocol.unregisterDevice(credentials, uuid, user_data))
