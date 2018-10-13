@@ -124,7 +124,7 @@ class ProtoSocketio(object):
 	def registerDevice(self, credentials, properties={}):
 		return self.__signinEmit(credentials, 'registerDevice', properties)
 
-	def unregisterDevice(self, credentials, properties={}):
+	def unregisterDevice(self, uuid, credentials, properties={}):
 		return self.__signinEmit(credentials, 'unregister', properties)
 
 	def subscribe(self, credentials, uuid, user_callback):
