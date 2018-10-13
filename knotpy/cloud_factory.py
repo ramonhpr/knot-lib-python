@@ -8,4 +8,5 @@ class CloudFactory(object):
 		logging.info('Selecting cloud ' + platform)
 		return {
 			'MESHBLU': Meshblu(protocol),
+			'FIWARE': Fiware(protocol),
 		}.get(platform.upper())

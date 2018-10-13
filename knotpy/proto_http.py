@@ -2,10 +2,10 @@ import requests
 import logging
 import json
 from uuid import UUID
-from .proto import KnotProtocol
+#from .proto import KnotProtocol
 __all__=[]
 
-class ProtoHttp(KnotProtocol):
+class ProtoHttp(object):
 	def __parseUrl(self, credentials):
 		return 'http://'+credentials.get('servername')+':'+str(credentials.get('port'))
 
