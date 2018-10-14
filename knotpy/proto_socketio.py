@@ -1,4 +1,5 @@
 from socketIO_client import SocketIO, BaseNamespace
+from .proto import Protocol
 import logging
 __all__=[]
 
@@ -93,7 +94,7 @@ class KNoTNamespace(BaseNamespace):
 		logging.info(args)
 		self.emit('identity', ProtoSocketio.cred)
 
-class ProtoSocketio(object):
+class ProtoSocketio(Protocol):
 	methodName = None
 	methodArgs = {}
 	methodCallBack = None
