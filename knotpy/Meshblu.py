@@ -96,7 +96,7 @@ class Meshblu(Cloud):
 		return omitDeviceParameters(handleResponseError(self.protocol.unregisterDevice(credentials, uuid, user_data)))
 
 	def myDevices(self, credentials):
-		return omitDevicesParameters(handleResponseError(self.protocol.myDevices(credentials).get('devices')))
+		return omitDevicesParameters(handleResponseError(self.protocol.myDevices(credentials)).get('devices'))
 
 	def subscribe(self, credentials, uuid, onReceive=None):
 		self.protocol.subscribe(credentials, uuid, onReceive)
