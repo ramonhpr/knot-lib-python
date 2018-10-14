@@ -2,6 +2,7 @@ import logging
 from uuid import UUID
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
+from .handler import handleResponseError
 __all__=[]
 
 def _omit(json, arr):
@@ -91,10 +92,10 @@ class Meshblu(object):
 		return omitDeviceRegisteredParameters(self.protocol.registerDevice(credentials, properties))
 
 	def unregisterDevice(self, credentials, uuid, user_data={}):
-		return omitDeviceParameters(self.protocol.unregisterDevice(credentials, uuid, user_data))
+		return omitDeviceParameters(handleResponseError(self.protocol.unregisterDevice(credentials, uuid, user_data)))
 
 	def myDevices(self, credentials):
-		return omitDevicesParameters(self.protocol.myDevices(credentials).get('devices'))
+		return omitDevicesParameters(handleResponseError(self.protocol.myDevices(credentials).get('devices')))
 
 	def subscribe(self, credentials, uuid, onReceive=None):
 		self.protocol.subscribe(credentials, uuid, onReceive)
@@ -106,7 +107,7 @@ class Meshblu(object):
 			raise Exception('uuid is required')
 		properties = {'uuid': uuid}
 		properties.update(user_data)
-		return omitDeviceParameters(self.protocol.update(credentials, uuid, properties))
+		return omitDeviceParameters(handleResponseError(self.protocol.update(credentials, uuid, properties)))
 
 	def getData(self, credentials, thing_uuid, **kwargs):
 		return self.protocol.getData(credentials, thing_uuid, **kwargs)
@@ -121,7 +122,7 @@ class Meshblu(object):
 		properties = {
 			'gateways': gateways
 		}
-		return omitDevicesParameters(ProtoSocketio().getDevices(credentials, properties))
+		return omitDevicesParameters(handleResponseError(ProtoSocketio().getDevices(credentials, properties)))
 
 	def setData(self, credentials, thing_uuid, sensor_id, value):
 		logging.warn('This function is using protocol socketio')
@@ -132,7 +133,7 @@ class Meshblu(object):
 				'value': value
 				}]
 		}
-		return omitDeviceParameters(ProtoSocketio().update(credentials, properties))
+		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, properties)))
 
 	def requestData(self, credentials, thing_uuid, sensor_id):
 		logging.warn('This function is using protocol socketio')
@@ -142,7 +143,7 @@ class Meshblu(object):
 				'sensor_id': sensor_id
 				}]
 		}
-		return omitDeviceParameters(ProtoSocketio().update(credentials, properties))
+		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, properties)))
 
 	def setConfig(self, credentials, thing_uuid, sensor_id, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
 		logging.warn('This function is using protocol socketio')
@@ -156,4 +157,4 @@ class Meshblu(object):
 				'upper_limit': upperLimit
 				}]
 		}
-		return omitDeviceParameters(ProtoSocketio().update(credentials, properties))
+		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, properties)))
