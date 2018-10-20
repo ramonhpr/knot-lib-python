@@ -14,6 +14,7 @@ def omitDeviceParameters(device):
 	'owner',
 	'type',
 	'ipAddress',
+	'uuid',
 	'token',
 	'meshblu',
 	'discoverWhitelist',
@@ -40,6 +41,13 @@ def omitDevicesParameters(devices):
 	for i,dev in enumerate(devices):
 		devices[i] = omitDeviceParameters(dev)
 	return devices
+
+def getDeviceUuid(devices, device_id):
+	try:
+		device = [d for d in devices if d.get('id') == device_id][0]
+	except IndexError as err:
+		raise IndexError('Device not found')
+	return device.get('uuid')
 
 def authHttpHeaders(credentials):
 	return {
@@ -92,31 +100,32 @@ class Meshblu(Cloud):
 			raise ValueError('Invalid credentials: ' + str(err))
 		return omitDeviceRegisteredParameters(self.protocol.registerDevice(credentials, properties))
 
-	def unregisterDevice(self, credentials, uuid, user_data={}):
+	def unregisterDevice(self, credentials, device_id, user_data={}):
+		uuid = getDeviceUuid(self.getThings(credentials), device_id)
 		return omitDeviceParameters(handleResponseError(self.protocol.unregisterDevice(credentials, uuid, user_data)))
 
 	def myDevices(self, credentials):
 		return omitDevicesParameters(handleResponseError(self.protocol.myDevices(credentials)).get('devices'))
 
-	def subscribe(self, credentials, uuid, onReceive=None):
+	def subscribe(self, credentials, device_id, onReceive=None):
+		uuid = getDeviceUuid(self.getThings(credentials), device_id)
 		self.protocol.subscribe(credentials, uuid, onReceive)
 
-	def update(self, credentials, uuid, user_data={}):
-		if not isinstance(uuid, str):
-			raise Exception('uuid is required')
-		if not uuid:
-			raise Exception('uuid is required')
+	def update(self, credentials, device_id, user_data={}):
+		uuid = getDeviceUuid(self.myDevices(credentials), device_id)
 		properties = {'uuid': uuid}
 		properties.update(user_data)
 		return omitDeviceParameters(handleResponseError(self.protocol.update(credentials, uuid, properties)))
 
-	def getData(self, credentials, thing_uuid, **kwargs):
-		return self.protocol.getData(credentials, thing_uuid, **kwargs)
+	def getData(self, credentials, device_id, **kwargs):
+		uuid = getDeviceUuid(self.getThings(credentials), device_id)
+		return self.protocol.getData(credentials, uuid, **kwargs)
 
-	def postData(self, credentials, thing_uuid, user_data={}):
-		properties = {'uuid': thing_uuid}
+	def postData(self, credentials, device_id, user_data={}):
+		uuid = getDeviceUuid(self.myDevices(credentials), device_id)
+		properties = {'uuid': uuid}
 		properties.update(user_data)
-		return self.protocol.postData(credentials, thing_uuid, properties)
+		return self.protocol.postData(credentials, uuid, properties)
 
 	def listSensors(self, credentials, thing_uuid):
 		device = [dev for dev in self.getThings(credentials) if dev.get('uuid') == thing_uuid][0]
@@ -147,10 +156,10 @@ class Meshblu(Cloud):
 		}
 		return omitDevicesParameters(handleResponseError(ProtoSocketio().getDevices(credentials, properties)))
 
-	def setData(self, credentials, thing_uuid, sensor_id, value):
-		logging.warn('This function is using protocol socketio')
+	def setData(self, credentials, device_id, sensor_id, value):
+		uuid = getDeviceUuid(self.getThings(credentials), device_id)
 		properties = {
-			'uuid': thing_uuid,
+			'uuid': uuid,
 			'set_data': [{
 				'sensor_id': sensor_id,
 				'value': value
@@ -158,20 +167,20 @@ class Meshblu(Cloud):
 		}
 		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, properties)))
 
-	def requestData(self, credentials, thing_uuid, sensor_id):
-		logging.warn('This function is using protocol socketio')
+	def requestData(self, credentials, device_id, sensor_id):
+		uuid = getDeviceUuid(self.getThings(credentials), device_id)
 		properties = {
-			'uuid': thing_uuid,
+			'uuid': uuid,
 			'get_data': [{
 				'sensor_id': sensor_id
 				}]
 		}
 		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, properties)))
 
-	def setConfig(self, credentials, thing_uuid, sensor_id, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
-		logging.warn('This function is using protocol socketio')
+	def setConfig(self, credentials, device_id, sensor_id, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
+		uuid = getDeviceUuid(self.getThings(credentials), device_id)
 		properties = {
-			'uuid': thing_uuid,
+			'uuid': uuid,
 			'config': [{
 				'sensor_id': sensor_id,
 				'event_flags': eventFlags,

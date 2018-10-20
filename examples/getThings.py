@@ -17,5 +17,5 @@ for thing in myThings:
 	if thing.get('schema'):
 		for sensor in thing.get('schema'):
 			if sensor['name'] == 'LED':
-				conn.setData(thing['uuid'], sensor['sensor_id'], True)
+				conn.setData(thing['id'], sensor['sensor_id'], True)
 	print(60*'*')'''
