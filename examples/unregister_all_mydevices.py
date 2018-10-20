@@ -13,6 +13,6 @@ try:
 			print(dev.get('id'))
 			print(dev.get('online'))
 			print(''),
-			knot.unregisterDevice(dev['uuid'])
+			knot.unregisterDevice(dev['id'])
 except Exception as err:
 	print('[ERR]: '+str(err))

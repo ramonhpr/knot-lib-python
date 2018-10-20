@@ -3,7 +3,7 @@ from credentials import *
 
 knot = KnotConnection(credentials, protocol='http')
 try:
-	thing_uuid = 'b4db3ef2-b969-4a49-aba1-1577d40f0000'
+	thing_uuid = '113'
 	knot.postData(thing_uuid, {'test': 'mydata'})
 	datas = knot.getData(thing_uuid)
 	for data in datas:
