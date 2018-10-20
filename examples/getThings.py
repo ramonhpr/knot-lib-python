@@ -1,6 +1,6 @@
 from knotpy import *
 from credentials import *
-conn = KnotConnection(credentials, protocol='http')
+conn = KnotConnection(credentials)
 
 myThings = conn.myDevices()
 
