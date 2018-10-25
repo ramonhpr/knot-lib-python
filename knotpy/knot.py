@@ -75,6 +75,11 @@ class KnotConnection(object):
 		return data
 
 	# The bellow methods just use in specific protocols
+	def listSensors(self, thing_uuid):
+		return self.cloud.listSensors(self.credentials, thing_uuid)
+
+	def getSensorDetails(self, thing_uuid, sensor_id):
+		return self.cloud.getSensorDetails(self.credentials, thing_uuid, sensor_id)
 
 	def getThings(self):
 		'''

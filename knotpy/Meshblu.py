@@ -117,6 +117,28 @@ class Meshblu(object):
 		properties.update(user_data)
 		return self.protocol.postData(credentials, thing_uuid, properties)
 
+	def listSensors(self, credentials, thing_uuid):
+		device = [dev for dev in self.getThings(credentials) if dev.get('uuid') == thing_uuid][0]
+		try:
+			return [i.get('sensor_id') for i in device['schema']]
+		except KeyError as err:
+			return []
+
+	def getSensorDetails(self, credentials, thing_uuid, sensor_id):
+		deviceSchema = []
+		try:
+			deviceSchema = [dev for dev in self.getThings(credentials) if dev.get('uuid') == thing_uuid][0]['schema']
+		except Exception as err:
+			raise Exception('None sensor is registered in this thing')
+
+		if len(deviceSchema) > 0:
+			try:
+				return [sensor for sensor in deviceSchema if sensor.get('sensor_id') == sensor_id][0]
+			except IndexError as err:
+				raise Exception('This thing has not this sensor id')
+		else:
+			raise Exception('None sensor is registered in this thing')
+
 	def getThings(self, credentials, gateways=['*']):
 		logging.warn('This function is using protocol socketio')
 		properties = {
