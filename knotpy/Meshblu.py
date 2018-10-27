@@ -59,8 +59,8 @@ class Meshblu(object):
 	def __init__(self, protocol):
 		logging.info('Using protocol ' + protocol)
 		self.protocol = {
-			'socketio': ProtoSocketio(),
-			'http': ProtoHttp(headers=authHttpHeaders,
+			'socketio': lambda: ProtoSocketio(),
+			'http': lambda: ProtoHttp(headers=authHttpHeaders,
 				addDev=lambda: {'type': 'POST', 'endpoint':'/devices'},
 				listDev=lambda: {'type': 'GET', 'endpoint':'/mydevices'},
 				rmDev=lambda uuid: {'type': 'DELETE', 'endpoint':'/devices/%s' %uuid},
@@ -68,7 +68,7 @@ class Meshblu(object):
 				addData=lambda uuid: {'type': 'POST', 'endpoint': '/data/%s' %uuid},
 				listData=lambda uuid: {'type': 'GET', 'endpoint': '/data/%s' %uuid},
 				subs=lambda uuid: {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid})
-		}.get(protocol.lower())
+		}.get(protocol.lower())()
 
 	def registerDevice(self, credentials, user_data={}):
 		properties = {'type':'KNoTDevice', 'owner': credentials['uuid']}

@@ -7,6 +7,6 @@ class CloudFactory(object):
 	def init(platform, protocol):
 		logging.info('Selecting cloud ' + platform)
 		return {
-			'MESHBLU': Meshblu(protocol),
-			'FIWARE': Fiware(protocol),
-		}.get(platform.upper())
+			'MESHBLU': lambda: Meshblu(protocol),
+			'FIWARE': lambda: Fiware(protocol),
+		}.get(platform.upper())()
