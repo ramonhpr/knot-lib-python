@@ -55,40 +55,19 @@ def authHttpHeaders(credentials):
 		'meshblu_auth_token': credentials.get('token')
 	}
 
-def addDevice():
-	return {'type': 'POST', 'endpoint':'/devices'}
-
-def rmDevice(uuid):
-	return {'type': 'DELETE', 'endpoint':'/devices/%s' %uuid}
-
-def listDevice():
-	return {'type': 'GET', 'endpoint':'/mydevices'}
-
-def updateDevice(uuid):
-	return {'type': 'PUT', 'endpoint':'/devices/%s' %uuid}
-
-def listData(uuid):
-	return {'type': 'GET', 'endpoint': '/data/%s' %uuid}
-
-def addData(uuid):
-	return {'type': 'POST', 'endpoint': '/data/%s' %uuid}
-
-def subs(uuid):
-	return {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid}
-
-class Meshblu(Cloud):
+class Meshblu(object):
 	def __init__(self, protocol):
 		logging.info('Using protocol ' + protocol)
 		self.protocol = {
 			'socketio': ProtoSocketio(),
 			'http': ProtoHttp(headers=authHttpHeaders,
-							addDev=addDevice,
-							rmDev=rmDevice,
-							listDev=listDevice,
-							updateDev=updateDevice,
-							addData=addData,
-							listData=listData,
-							subs=subs)
+				addDev=lambda: {'type': 'POST', 'endpoint':'/devices'},
+				listDev=lambda: {'type': 'GET', 'endpoint':'/mydevices'},
+				rmDev=lambda uuid: {'type': 'DELETE', 'endpoint':'/devices/%s' %uuid},
+				updateDev=lambda uuid: {'type': 'PUT', 'endpoint':'/devices/%s' %uuid},
+				addData=lambda uuid: {'type': 'POST', 'endpoint': '/data/%s' %uuid},
+				listData=lambda uuid: {'type': 'GET', 'endpoint': '/data/%s' %uuid},
+				subs=lambda uuid: {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid})
 		}.get(protocol.lower())
 
 	def registerDevice(self, credentials, user_data={}):
