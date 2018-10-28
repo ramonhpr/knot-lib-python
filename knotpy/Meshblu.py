@@ -22,6 +22,7 @@ def omitDeviceParameters(device):
 	'socketid',
 	'secure',
 	'get_data',
+	'schema',
 	'set_data'])
 
 def omitDeviceRegisteredParameters(device):

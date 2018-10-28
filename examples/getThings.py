@@ -2,7 +2,7 @@ from knotpy import *
 from credentials import *
 conn = KnotConnection(credentials)
 
-myThings = conn.myDevices()
+myThings = conn.getDevices()
 
 for thing in myThings:
 	print(thing)

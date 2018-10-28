@@ -11,14 +11,6 @@ class KnotConnection(object):
 		self.cloud = CloudFactory.init(cloud, protocol)
 		self.credentials = credentials
 
-	def registerDevice(self, user_data={}):
-		'''
-		Register a device in the cloud with owner credentials
-		and return a dict/json with the device added
-		'''
-		result = self.cloud.registerDevice(self.credentials, user_data)
-		return result
-
 	def unregisterDevice(self, device_id, user_data={}):
 		'''
 		Unregister a device with the credentials passed by the dict/json
@@ -27,35 +19,11 @@ class KnotConnection(object):
 		result = self.cloud.unregisterDevice(self.credentials, device_id, user_data)
 		return handleResponseError(result)
 
-	def update(self, device_id, user_data={}):
-		'''
-		Update a device with the credentials passed by the dict/json
-		parameter and return the successed json message
-		'''
-		result = self.cloud.update(self.credentials, device_id, user_data)
-		return handleResponseError(result)
-
-	def myDevices(self):
-		'''
-		Return all devices of your gateway
-		Note:
-			If you run it in the cloud it returns the gateway device
-			If you run it in the fog it returns all the devices of your gateway
-		'''
-		result = self.cloud.myDevices(self.credentials)
-		return handleResponseError(result)
-
 	def subscribe(self, device_id, onReceive=None):
 		'''
 		Subscribe the device to monitor changes on it
 		'''
 		self.cloud.subscribe(self.credentials, device_id, onReceive)
-
-	def postData(self, device_id, user_data={}):
-		'''
-		Post the json passed in user_data to the cloud
-		'''
-		return self.cloud.postData(self.credentials, device_id, user_data)
 
 	def getData(self, device_id, **kwargs):
 		'''
@@ -74,16 +42,15 @@ class KnotConnection(object):
 		data = handleResponseError(result).get('data')
 		return data
 
-	# The bellow methods just use in specific protocols
 	def listSensors(self, thing_uuid):
 		return self.cloud.listSensors(self.credentials, thing_uuid)
 
 	def getSensorDetails(self, thing_uuid, sensor_id):
 		return self.cloud.getSensorDetails(self.credentials, thing_uuid, sensor_id)
 
-	def getThings(self):
+	def getDevices(self):
 		'''
-		Get the things of your user
+		Get the devices of your user
 		'''
 		result = self.cloud.getThings(self.credentials)
 		return handleResponseError(result)
