@@ -131,7 +131,8 @@ class ProtoSocketio(Protocol):
 	def subscribe(self, credentials, uuid, user_callback):
 		return self.__signinEmit(credentials, 'subscribe', {'uuid': uuid}, lambda socket, result: user_callback(result))
 
-	def update(self, credentials, id, properties={}):
+	def update(self, credentials, uuid, properties={}):
+		properties.update({'uuid':uuid})
 		return self.__signinEmit(credentials, 'update', properties)
 
 	def postData(self, credentials, user_data={}):
