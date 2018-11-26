@@ -116,7 +116,7 @@ class Meshblu(object):
 		devices = ProtoSocketio().getDevices(credentials,
 							{'gateways': ['*']})
 		uuid = getDeviceUuid(devices, device_id)
-                schema = [dev.get('schema') for dev in devices if dev.get('uuid') == uuid][0]
+		schema = [dev.get('schema') for dev in devices if dev.get('uuid') == uuid][0]
 		try:
 			return [sensor.get('sensor_id') for sensor in schema]
 		except KeyError as err:
