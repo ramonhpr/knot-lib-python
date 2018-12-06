@@ -1,4 +1,5 @@
 import logging
+import functools
 from uuid import UUID
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
@@ -50,6 +51,15 @@ def getDeviceUuid(devices, device_id):
 		raise IndexError('Device not found')
 	return device.get('uuid')
 
+def useUuid(func):
+	@functools.wraps(func)
+	def func_wrapper(self, credentials, device_id, *args, **kwargs):
+		devices = ProtoSocketio().getDevices(credentials,
+							{'gateways': ['*']})
+		uuid = getDeviceUuid(devices, device_id)
+		return func(self, credentials, uuid, *args, **kwargs)
+	return func_wrapper
+
 def authHttpHeaders(credentials):
 	return {
 		'meshblu_auth_uuid': credentials.get('uuid'),
@@ -80,37 +90,32 @@ class Meshblu(object):
 			raise ValueError('Invalid credentials: ' + str(err))
 		return omitDeviceRegisteredParameters(self.protocol.registerDevice(credentials, properties))
 
+	@useUuid
 	def unregisterDevice(self, credentials, device_id, user_data={}):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		return omitDeviceParameters(handleResponseError(self.protocol.unregisterDevice(credentials, uuid, user_data)))
+		return omitDeviceParameters(handleResponseError(self.protocol.unregisterDevice(device_id, credentials, user_data)))
 
 	def myDevices(self, credentials):
 		return omitDevicesParameters(handleResponseError(self.protocol.myDevices(credentials)).get('devices'))
 
+	@useUuid
 	def subscribe(self, credentials, device_id, onReceive=None):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		self.protocol.subscribe(credentials, uuid, onReceive)
+		self.protocol.subscribe(credentials, device_id, onReceive)
 
+	@useUuid
 	def update(self, credentials, device_id, user_data={}):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		properties = {'uuid': uuid}
+		properties = {'uuid': device_id}
 		properties.update(user_data)
-		return omitDeviceParameters(handleResponseError(self.protocol.update(credentials, uuid, properties)))
+		return omitDeviceParameters(handleResponseError(self.protocol.update(credentials, device_id, properties)))
 
+	@useUuid
 	def getData(self, credentials, device_id, **kwargs):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		return self.protocol.getData(credentials, uuid, **kwargs)
+		return self.protocol.getData(credentials, device_id, **kwargs)
 
+	@useUuid
 	def postData(self, credentials, device_id, user_data={}):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		properties = {'uuid': uuid}
+		properties = {'uuid': device_id}
 		properties.update(user_data)
-		return self.protocol.postData(credentials, uuid, properties)
+		return self.protocol.postData(credentials, device_id, properties)
 
 	def listSensors(self, credentials, device_id):
 		devices = ProtoSocketio().getDevices(credentials,
@@ -147,30 +152,27 @@ class Meshblu(object):
 		}
 		return omitDevicesParameters(handleResponseError(ProtoSocketio().getDevices(credentials, properties)))
 
+	@useUuid
 	def setData(self, credentials, device_id, sensor_id, value):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
 		properties = {
 			'set_data': [{
 				'sensor_id': sensor_id,
 				'value': value
 				}]
 		}
-		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, uuid, properties)))
+		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, device_id, properties)))
 
+	@useUuid
 	def requestData(self, credentials, device_id, sensor_id):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
 		properties = {
 			'get_data': [{
 				'sensor_id': sensor_id
 				}]
 		}
-		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, uuid, properties)))
+		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, device_id, properties)))
 
+	@useUuid
 	def setConfig(self, credentials, device_id, sensor_id, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
 		properties = {
 			'config': [{
 				'sensor_id': sensor_id,
@@ -180,4 +182,4 @@ class Meshblu(object):
 				'upper_limit': upperLimit
 				}]
 		}
-		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, uuid, properties)))
+		return omitDeviceParameters(handleResponseError(ProtoSocketio().update(credentials, device_id, properties)))
