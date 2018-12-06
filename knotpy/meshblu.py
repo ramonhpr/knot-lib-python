@@ -1,4 +1,5 @@
 import logging
+import functools
 from uuid import UUID
 from .evt_flag import FLAG_CHANGE
 from .proto_socketio import ProtoSocketio
@@ -55,6 +56,20 @@ def get_device_uuid(devices, device_id):
         raise IndexError('Device not found')
     return device.get('uuid')
 
+def can_convert_to_uuid(func):
+    '''
+        This decorator verify if it should use parent connection
+        to convert the device id to uuid
+    '''
+    @functools.wraps(func)
+    def decorator_use_uuid(self, credentials, device_id, *args, **kwargs):
+        if self.use_parent_conn:
+            devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
+            uuid = get_device_uuid(devices, device_id)
+            return func(self, credentials, uuid, *args, **kwargs)
+        return func(self, credentials, device_id, *args, **kwargs)
+    return decorator_use_uuid
+
 def auth_http_headers(credentials):
     return {
         'meshblu_auth_uuid': credentials.get('uuid'),
@@ -62,8 +77,12 @@ def auth_http_headers(credentials):
     }
 
 class Meshblu(Cloud):
-    def __init__(self, protocol):
+    use_parent_conn = False
+    def __init__(self, protocol, use_parent_conn=False):
         logging.info('Using protocol %s', protocol)
+        self.use_parent_conn = use_parent_conn
+        if self.use_parent_conn:
+            logging.info('Requests will change id to uuid')
         self.protocol = {
             'socketio': ProtoSocketio,
             'http': lambda: ProtoHttp(
@@ -77,6 +96,7 @@ class Meshblu(Cloud):
                 subs=lambda uuid: {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid})
         }.get(protocol.lower())()
 
+    @can_convert_to_uuid
     def register_device(self, credentials, user_data=None):
         properties = {'type':'KNoTDevice', 'owner': credentials['uuid']}
         properties.update(user_data)
@@ -86,58 +106,46 @@ class Meshblu(Cloud):
             raise ValueError('Invalid credentials: ' + str(err))
         return omit_device_registered_params(self.protocol.register_device(credentials, properties))
 
+    @can_convert_to_uuid
     def unregister_device(self, credentials, device_id, user_data=None):
-        uuid = get_device_uuid(
-            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
-            device_id)
-        return omit_device_params(handle_response_error(self.protocol.unregister_device(credentials, uuid, user_data)))
+        return omit_device_params(handle_response_error(self.protocol.unregister_device(credentials, device_id, user_data)))
 
     def my_devices(self, credentials):
         return omit_devices_params(handle_response_error(self.protocol.my_devices(credentials)).get('devices'))
 
+    @can_convert_to_uuid
     def subscribe(self, credentials, device_id, on_receive=None):
-        uuid = get_device_uuid(
-            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
-            device_id)
-        self.protocol.subscribe(credentials, uuid, on_receive)
+        self.protocol.subscribe(credentials, device_id, on_receive)
 
+    @can_convert_to_uuid
     def update(self, credentials, device_id, user_data=None):
-        uuid = get_device_uuid(
-            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
-            device_id)
-        properties = {'uuid': uuid}
-        properties.update(user_data)
-        return omit_device_params(handle_response_error(self.protocol.update(credentials, uuid, properties)))
+        return omit_device_params(handle_response_error(self.protocol.update(credentials, device_id, user_data)))
 
+    @can_convert_to_uuid
     def get_data(self, credentials, device_id, **kwargs):
-        uuid = get_device_uuid(
-            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
-            device_id)
-        return self.protocol.get_data(credentials, uuid, **kwargs)
+        return self.protocol.get_data(credentials, device_id, **kwargs)
 
+    @can_convert_to_uuid
     def post_data(self, credentials, device_id, user_data=None):
-        uuid = get_device_uuid(
-            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
-            device_id)
-        properties = {'uuid': uuid}
+        properties = {'uuid': device_id}
         properties.update(user_data)
-        return self.protocol.post_data(credentials, uuid, properties)
+        return self.protocol.post_data(credentials, device_id, user_data)
 
+    @can_convert_to_uuid
     def list_sensors(self, credentials, device_id):
         devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
-        uuid = get_device_uuid(devices, device_id)
         try:
-            device = [dev for dev in devices if dev.get('uuid') == uuid][0]
+            device = [dev for dev in devices if dev.get('uuid') == device_id][0]
             return [sensor.get('sensor_id') for sensor in device['schema']]
         except KeyError:
             return []
 
     @classmethod
+    @can_convert_to_uuid
     def get_sensor_details(cls, credentials, device_id, sensor_id):
         devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
-        uuid = get_device_uuid(devices, device_id)
         try:
-            device = [dev for dev in devices if dev.get('uuid') == uuid][0]
+            device = [dev for dev in devices if dev.get('uuid') == device_id][0]
             return [i for i in device['schema'] if i.get('sensor_id') == sensor_id][0]
         except KeyError:
             raise Exception('None sensor is registered in this thing')
@@ -151,36 +159,30 @@ class Meshblu(Cloud):
         }
         return omit_devices_params(handle_response_error(ProtoSocketio().getDevices(credentials, properties)))
 
+    @can_convert_to_uuid
     def set_data(self, credentials, device_id, sensor_id, value):
-        uuid = get_device_uuid(
-            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
-            device_id)
         properties = {
             'set_data': [{
                 'sensor_id': sensor_id,
                 'value': value
                 }]
         }
-        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, uuid, properties)))
+        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, device_id, properties)))
 
+    @can_convert_to_uuid
     def request_data(self, credentials, device_id, sensor_id):
-        uuid = get_device_uuid(
-            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
-            device_id)
         properties = {
             'get_data': [{
                 'sensor_id': sensor_id
                 }]
         }
-        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, uuid, properties)))
+        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, device_id, properties)))
 
+    @can_convert_to_uuid
     def send_config(self, credentials, device_id, sensor_id, event_flags=FLAG_CHANGE, **kwargs):
         time_sec = kwargs.get('time_sec')
         lower_limit = kwargs.get('lower_limit')
         upper_limit = kwargs.get('upper_limit')
-        uuid = get_device_uuid(
-            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
-            device_id)
         properties = {
             'config': [{
                 'sensor_id': sensor_id,
@@ -190,4 +192,4 @@ class Meshblu(Cloud):
                 'upper_limit': upper_limit
                 }]
         }
-        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, uuid, properties)))
+        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, device_id, properties)))
