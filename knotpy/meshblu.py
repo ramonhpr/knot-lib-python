@@ -6,48 +6,28 @@ from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
 from .handler import handle_response_error
 from .cloud import Cloud
+from .decorators import omit
 __all__ = []
 
-def _omit(json, arr):
-    return {k: v for k, v in json.items() if k not in arr}
+# Device parameters to be omitted
+DEVICE_PARAMS = [
+    '_id',
+    'owner',
+    'type',
+    'ipAddress',
+    'uuid',
+    'token',
+    'meshblu',
+    'discoverWhitelist',
+    'configureWhitelist',
+    'socketid',
+    'secure',
+    'get_data',
+    'schema',
+    'set_data']
 
-def omit_device_params(device):
-    return _omit(
-        device, [
-            '_id',
-            'owner',
-            'type',
-            'ipAddress',
-            'uuid',
-            'token',
-            'meshblu',
-            'discoverWhitelist',
-            'configureWhitelist',
-            'socketid',
-            'secure',
-            'get_data',
-            'schema',
-            'set_data'])
-
-def omit_device_registered_params(device):
-    return _omit(
-        device, [
-            '_id',
-            'owner',
-            'type',
-            'ipAddress',
-            'meshblu',
-            'discoverWhitelist',
-            'configureWhitelist',
-            'socketid',
-            'secure',
-            'get_data',
-            'set_data'])
-
-def omit_devices_params(devices):
-    for i, dev in enumerate(devices):
-        devices[i] = omit_device_params(dev)
-    return devices
+REGISTERED_PARAMS = list(DEVICE_PARAMS)
+REGISTERED_PARAMS.remove('token') # don't omit token in register
 
 def get_device_uuid(devices, device_id):
     try:
@@ -96,6 +76,7 @@ class Meshblu(Cloud):
                 subs=lambda uuid: {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid})
         }.get(protocol.lower())()
 
+    @omit(REGISTERED_PARAMS)
     @can_convert_to_uuid
     def register_device(self, credentials, user_data=None):
         properties = {'type':'KNoTDevice', 'owner': credentials['uuid']}
@@ -104,34 +85,41 @@ class Meshblu(Cloud):
             UUID(credentials.get('uuid'), version=4)
         except ValueError as err:
             raise ValueError('Invalid credentials: ' + str(err))
-        return omit_device_registered_params(self.protocol.register_device(credentials, properties))
+        return self.protocol.register_device(credentials, properties)
 
+    @omit(DEVICE_PARAMS)
     @can_convert_to_uuid
     def unregister_device(self, credentials, device_id, user_data=None):
-        return omit_device_params(handle_response_error(self.protocol.unregister_device(credentials, device_id, user_data)))
+        return handle_response_error(self.protocol.unregister_device(credentials, device_id, user_data))
 
+    @omit(DEVICE_PARAMS)
     def my_devices(self, credentials):
-        return omit_devices_params(handle_response_error(self.protocol.my_devices(credentials)).get('devices'))
+        return handle_response_error(self.protocol.my_devices(credentials)).get('devices')
 
     @can_convert_to_uuid
+    @omit(DEVICE_PARAMS)
     def subscribe(self, credentials, device_id, on_receive=None):
         self.protocol.subscribe(credentials, device_id, on_receive)
 
     @can_convert_to_uuid
+    @omit(DEVICE_PARAMS)
     def update(self, credentials, device_id, user_data=None):
-        return omit_device_params(handle_response_error(self.protocol.update(credentials, device_id, user_data)))
+        return handle_response_error(self.protocol.update(credentials, device_id, user_data))
 
     @can_convert_to_uuid
+    @omit(DEVICE_PARAMS)
     def get_data(self, credentials, device_id, **kwargs):
         return self.protocol.get_data(credentials, device_id, **kwargs)
 
     @can_convert_to_uuid
+    @omit(DEVICE_PARAMS)
     def post_data(self, credentials, device_id, user_data=None):
         properties = {'uuid': device_id}
         properties.update(user_data)
         return self.protocol.post_data(credentials, device_id, user_data)
 
     @can_convert_to_uuid
+    @omit(DEVICE_PARAMS)
     def list_sensors(self, credentials, device_id):
         devices = ProtoSocketio().get_devices(credentials, {'gateways': ['*']})
         try:
@@ -142,6 +130,7 @@ class Meshblu(Cloud):
 
     @classmethod
     @can_convert_to_uuid
+    @omit(DEVICE_PARAMS)
     def get_sensor_details(cls, credentials, device_id, sensor_id):
         devices = ProtoSocketio().get_devices(credentials, {'gateways': ['*']})
         try:
@@ -152,14 +141,16 @@ class Meshblu(Cloud):
         except IndexError:
             raise Exception('This thing has not this sensor_id %s' %sensor_id)
 
+    @omit(DEVICE_PARAMS)
     def get_things(self, credentials, gateways=None):
         logging.warning('This function is using protocol socketio')
         properties = {
             'gateways': gateways or ['*']
         }
-        return omit_devices_params(handle_response_error(ProtoSocketio().get_devices(credentials, properties)))
+        return handle_response_error(ProtoSocketio().get_devices(credentials, properties))
 
     @can_convert_to_uuid
+    @omit(DEVICE_PARAMS)
     def set_data(self, credentials, device_id, sensor_id, value):
         properties = {
             'set_data': [{
@@ -167,18 +158,20 @@ class Meshblu(Cloud):
                 'value': value
                 }]
         }
-        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, device_id, properties)))
+        return handle_response_error(ProtoSocketio().update(credentials, device_id, properties))
 
     @can_convert_to_uuid
+    @omit(DEVICE_PARAMS)
     def request_data(self, credentials, device_id, sensor_id):
         properties = {
             'get_data': [{
                 'sensor_id': sensor_id
                 }]
         }
-        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, device_id, properties)))
+        return handle_response_error(ProtoSocketio().update(credentials, device_id, properties))
 
     @can_convert_to_uuid
+    @omit(DEVICE_PARAMS)
     def send_config(self, credentials, device_id, sensor_id, event_flags=FLAG_CHANGE, **kwargs):
         time_sec = kwargs.get('time_sec')
         lower_limit = kwargs.get('lower_limit')
@@ -192,4 +185,4 @@ class Meshblu(Cloud):
                 'upper_limit': upper_limit
                 }]
         }
-        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, device_id, properties)))
+        return handle_response_error(ProtoSocketio().update(credentials, device_id, properties))
