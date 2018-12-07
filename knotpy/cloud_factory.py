@@ -1,6 +1,6 @@
 import logging
-from .Meshblu import Meshblu
-from .Fiware import Fiware
+from .meshblu import Meshblu
+from .fiware import Fiware
 
 class CloudFactory():
     @staticmethod

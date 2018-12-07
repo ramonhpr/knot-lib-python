@@ -1,7 +1,7 @@
 import logging
 from .evt_flag import FLAG_CHANGE
 from .proto_http import ProtoHttp
-from .Cloud import Cloud
+from .cloud import Cloud
 from .handler import handle_fiware_response
 __all__ = []
 
