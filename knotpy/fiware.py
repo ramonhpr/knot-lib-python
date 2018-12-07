@@ -54,12 +54,12 @@ class Fiware(Cloud):
         self.protocol = {
             'http': ProtoHttp(
                 headers=auth_http_headers,
-                addDev=lambda: {'type': 'POST', 'endpoint':'/v2/entities'},
-                listDev=lambda: {'type': 'POST', 'endpoint':'/v1/queryContext'},
-                rmDev=lambda device_id: {'type': 'DELETE', 'endpoint':'/v2/entities/%s' %device_id},
-                updateDev=lambda device_id: {'type': 'POST', 'endpoint':'/v1/updateContext'},
-                addData=lambda device_id: {'type': 'POST', 'endpoint': '/data/%s' %device_id},
-                listData=lambda device_id: {'type': 'GET', 'endpoint': '/v2/entities/%s?options=keyValues' %device_id},
+                add_dev=lambda: {'type': 'POST', 'endpoint':'/v2/entities'},
+                list_dev=lambda: {'type': 'POST', 'endpoint':'/v1/queryContext'},
+                rm_dev=lambda device: {'type': 'DELETE', 'endpoint':'/v2/entities/%s' %device},
+                update_dev=lambda: {'type': 'POST', 'endpoint':'/v1/updateContext'},
+                add_data=lambda device: {'type': 'POST', 'endpoint': '/data/%s' %device},
+                list_data=lambda device: {'type': 'GET', 'endpoint': '/v2/entities/%s?options=keyValues' %device},
                 subs=lambda: {'type': 'POST', 'endpoint': 'v2/subscriptions'})
         }.get(protocol.lower())
 
@@ -74,7 +74,7 @@ class Fiware(Cloud):
             raise err
 
         tmp_protocol = self.protocol
-        tmp_protocol.rmDev = lambda device: {'type': 'DELETE', 'endpoint': '/iot/devices/%s' %device}
+        tmp_protocol.rm_dev = lambda device: {'type': 'DELETE', 'endpoint': '/iot/devices/%s' %device}
         iotagent_response = tmp_protocol.unregister_device({'servername': credentials['servername'], 'port': 4041}, device_id)
         try:
             return handle_fiware_response(iotagent_response)

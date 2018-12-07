@@ -64,7 +64,7 @@ def can_convert_to_uuid(func):
     @functools.wraps(func)
     def decorator_use_uuid(self, credentials, device_id, *args, **kwargs):
         if self.use_parent_conn:
-            devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
+            devices = ProtoSocketio().get_devices(credentials, {'gateways': ['*']})
             uuid = get_device_uuid(devices, device_id)
             return func(self, credentials, uuid, *args, **kwargs)
         return func(self, credentials, device_id, *args, **kwargs)
@@ -87,12 +87,12 @@ class Meshblu(Cloud):
             'socketio': ProtoSocketio,
             'http': lambda: ProtoHttp(
                 headers=auth_http_headers,
-                addDev=lambda: {'type': 'POST', 'endpoint':'/devices'},
-                listDev=lambda: {'type': 'GET', 'endpoint':'/my_devices'},
-                rmDev=lambda uuid: {'type': 'DELETE', 'endpoint':'/devices/%s' %uuid},
-                updateDev=lambda uuid: {'type': 'PUT', 'endpoint':'/devices/%s' %uuid},
-                addData=lambda uuid: {'type': 'POST', 'endpoint': '/data/%s' %uuid},
-                listData=lambda uuid: {'type': 'GET', 'endpoint': '/data/%s' %uuid},
+                add_dev=lambda: {'type': 'POST', 'endpoint':'/devices'},
+                list_dev=lambda: {'type': 'GET', 'endpoint':'/my_devices'},
+                rm_dev=lambda uuid: {'type': 'DELETE', 'endpoint':'/devices/%s' %uuid},
+                update_dev=lambda uuid: {'type': 'PUT', 'endpoint':'/devices/%s' %uuid},
+                add_data=lambda uuid: {'type': 'POST', 'endpoint': '/data/%s' %uuid},
+                list_data=lambda uuid: {'type': 'GET', 'endpoint': '/data/%s' %uuid},
                 subs=lambda uuid: {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid})
         }.get(protocol.lower())()
 
@@ -133,7 +133,7 @@ class Meshblu(Cloud):
 
     @can_convert_to_uuid
     def list_sensors(self, credentials, device_id):
-        devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
+        devices = ProtoSocketio().get_devices(credentials, {'gateways': ['*']})
         try:
             device = [dev for dev in devices if dev.get('uuid') == device_id][0]
             return [sensor.get('sensor_id') for sensor in device['schema']]
@@ -143,7 +143,7 @@ class Meshblu(Cloud):
     @classmethod
     @can_convert_to_uuid
     def get_sensor_details(cls, credentials, device_id, sensor_id):
-        devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
+        devices = ProtoSocketio().get_devices(credentials, {'gateways': ['*']})
         try:
             device = [dev for dev in devices if dev.get('uuid') == device_id][0]
             return [i for i in device['schema'] if i.get('sensor_id') == sensor_id][0]
@@ -157,7 +157,7 @@ class Meshblu(Cloud):
         properties = {
             'gateways': gateways or ['*']
         }
-        return omit_devices_params(handle_response_error(ProtoSocketio().getDevices(credentials, properties)))
+        return omit_devices_params(handle_response_error(ProtoSocketio().get_devices(credentials, properties)))
 
     @can_convert_to_uuid
     def set_data(self, credentials, device_id, sensor_id, value):
