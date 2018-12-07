@@ -1,28 +1,29 @@
-class Cloud(object):
-	def registerDevice(self, credentials, user_data={}):
-		pass
-	def unregisterDevice(self, credentials, uuid, user_data={}):
-		pass
-	def myDevices(self, credentials):
-		pass
-	def subscribe(self, credentials, uuid, onReceive=None):
-		pass
-	def update(self, credentials, uuid, user_data={}):
-		pass
-	def getData(self, credentials, thing_uuid, **kwargs):
-		pass
-	def postData(self, credentials, thing_uuid, user_data={}):
-		pass
-	def listSensors(self, credentials, thing_uuid):
-		pass
-	def getSensorDetail(self, credentials, thing_uuid, sensor_id):
-		pass
-	def getThings(self, credentials, gateways=['*']):
-		pass
-	def setData(self, credentials, thing_uuid, sensor_id, value):
-		pass
-	def requestData(self, credentials, thing_uuid, sensor_id):
-		pass
-	def setConfig(self, credentials, thing_uuid, sensor_id,
-					eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
-		pass
+from .evt_flag import FLAG_CHANGE
+
+class Cloud():
+    def register_device(self, credentials, user_data=None):
+        pass
+    def unregister_device(self, credentials, device_id, user_data=None):
+        pass
+    def my_devices(self, credentials):
+        pass
+    def subscribe(self, credentials, device_id, on_receive=None):
+        pass
+    def update(self, credentials, device_id, user_data=None):
+        pass
+    def get_data(self, credentials, device_id, **kwargs):
+        pass
+    def post_data(self, credentials, device_id, user_data=None):
+        pass
+    def list_sensors(self, credentials, device_id):
+        pass
+    def get_sensor_detail(self, credentials, device_id, sensor_id):
+        pass
+    def get_things(self, credentials, gateways=None):
+        pass
+    def set_data(self, credentials, device_id, sensor_id, value):
+        pass
+    def request_data(self, credentials, device_id, sensor_id):
+        pass
+    def send_config(self, credentials, device_id, sensor_id, event_flags=FLAG_CHANGE, **kwargs):
+        pass

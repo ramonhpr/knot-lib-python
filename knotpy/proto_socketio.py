@@ -43,8 +43,8 @@ class KNoTNamespace(BaseNamespace):
 		ProtoSocketio.result = args[0]
 		self.disconnect()
 
-	def on_mydevices(self, *args):
-		logging.info('MyDevices')
+	def on_my_devices(self, *args):
+		logging.info('my_devices')
 		logging.info(args[0])
 		ProtoSocketio.result = args[0]
 		self.disconnect()
@@ -61,7 +61,7 @@ class KNoTNamespace(BaseNamespace):
 		ProtoSocketio.result = args[0] if args else None
 		self.disconnect()
 
-	def on_getdata(self, *args):
+	def on_get_data(self, *args):
 		logging.info('Get data')
 		logging.info(args[0])
 		ProtoSocketio.result = args[0]
@@ -73,13 +73,13 @@ class KNoTNamespace(BaseNamespace):
 		# The below 'switch' select which callback must be emitted
 		emit = {
 			'getDevices': lambda: self.emit('devices', ProtoSocketio.methodArgs, self.on_devices),
-			'registerDevice': lambda: self.emit('register', ProtoSocketio.methodArgs, self.on_register),
-			'myDevices': lambda: self.emit('mydevices', { }, self.on_mydevices),
+			'register_device': lambda: self.emit('register', ProtoSocketio.methodArgs, self.on_register),
+			'my_devices': lambda: self.emit('my_devices', { }, self.on_my_devices),
 			'subscribe': lambda: self.emit('subscribe', ProtoSocketio.methodArgs, self.on_subscribe),
 			'update': lambda: self.emit('update', ProtoSocketio.methodArgs, self.on_update),
 			'unregister': lambda: self.emit('unregister', ProtoSocketio.methodArgs, self.on_unregister),
 			'data': lambda : self.emit('data', ProtoSocketio.methodArgs, self.on_data),
-			'getdata': lambda : self.emit('getdata', ProtoSocketio.methodArgs, self.on_getdata)
+			'get_data': lambda : self.emit('get_data', ProtoSocketio.methodArgs, self.on_get_data)
 		}.get(ProtoSocketio.methodName)
 		logging.info('Emitting signal for ' + ProtoSocketio.methodName)
 		emit()
@@ -116,16 +116,16 @@ class ProtoSocketio(Protocol):
 			pass
 		return ProtoSocketio.result
 
-	def myDevices(self, credentials):
-		return self.__signinEmit(credentials, 'myDevices')
+	def my_devices(self, credentials):
+		return self.__signinEmit(credentials, 'my_devices')
 
 	def getDevices(self, credentials, properties={}):
 		return self.__signinEmit(credentials, 'getDevices', properties)
 
-	def registerDevice(self, credentials, properties={}):
-		return self.__signinEmit(credentials, 'registerDevice', properties)
+	def register_device(self, credentials, properties={}):
+		return self.__signinEmit(credentials, 'register_device', properties)
 
-	def unregisterDevice(self, uuid, credentials, properties={}):
+	def unregister_device(self, uuid, credentials, properties={}):
 		return self.__signinEmit(credentials, 'unregister', properties)
 
 	def subscribe(self, credentials, uuid, user_callback):
@@ -135,10 +135,10 @@ class ProtoSocketio(Protocol):
 		properties.update({'uuid':uuid})
 		return self.__signinEmit(credentials, 'update', properties)
 
-	def postData(self, credentials, user_data={}):
+	def post_data(self, credentials, user_data={}):
 		return self.__signinEmit(credentials, 'data', user_data)
 
-	def getData(self, credentials, uuid, **kwargs):
+	def get_data(self, credentials, uuid, **kwargs):
 		kwargs.update({
 			'uuid': credentials.get('uuid'),
 			'token': credentials.get('token'),
@@ -147,4 +147,4 @@ class ProtoSocketio(Protocol):
 			'start': kwargs.get('start'),
 			'stop': kwargs.get('stop')
 		})
-		return self.__signinEmit(credentials, 'getdata', kwargs)
+		return self.__signinEmit(credentials, 'get_data', kwargs)

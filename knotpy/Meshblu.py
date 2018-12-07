@@ -1,183 +1,199 @@
 import logging
 from uuid import UUID
+from .evt_flag import FLAG_CHANGE
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
 from .handler import handle_response_error
 from .Cloud import Cloud
-__all__=[]
+__all__ = []
 
 def _omit(json, arr):
-	return {k: v for k,v in json.items() if k not in arr}
+    return {k: v for k, v in json.items() if k not in arr}
 
-def omitDeviceParameters(device):
-	return _omit(device,['_id',
-	'owner',
-	'type',
-	'ipAddress',
-	'uuid',
-	'token',
-	'meshblu',
-	'discoverWhitelist',
-	'configureWhitelist',
-	'socketid',
-	'secure',
-	'get_data',
-	'schema',
-	'set_data'])
+def omit_device_params(device):
+    return _omit(
+        device, [
+            '_id',
+            'owner',
+            'type',
+            'ipAddress',
+            'uuid',
+            'token',
+            'meshblu',
+            'discoverWhitelist',
+            'configureWhitelist',
+            'socketid',
+            'secure',
+            'get_data',
+            'schema',
+            'set_data'])
 
-def omitDeviceRegisteredParameters(device):
-	return _omit(device,['_id',
-	'owner',
-	'type',
-	'ipAddress',
-	'meshblu',
-	'discoverWhitelist',
-	'configureWhitelist',
-	'socketid',
-	'secure',
-	'get_data',
-	'set_data'])
+def omit_device_registered_params(device):
+    return _omit(
+        device, [
+            '_id',
+            'owner',
+            'type',
+            'ipAddress',
+            'meshblu',
+            'discoverWhitelist',
+            'configureWhitelist',
+            'socketid',
+            'secure',
+            'get_data',
+            'set_data'])
 
-def omitDevicesParameters(devices):
-	for i,dev in enumerate(devices):
-		devices[i] = omitDeviceParameters(dev)
-	return devices
+def omit_devices_params(devices):
+    for i, dev in enumerate(devices):
+        devices[i] = omit_device_params(dev)
+    return devices
 
-def getDeviceUuid(devices, device_id):
-	try:
-		device = [d for d in devices if d.get('id') == device_id][0]
-	except IndexError as err:
-		raise IndexError('Device not found')
-	return device.get('uuid')
+def get_device_uuid(devices, device_id):
+    try:
+        device = [d for d in devices if d.get('id') == device_id][0]
+    except IndexError:
+        raise IndexError('Device not found')
+    return device.get('uuid')
 
-def authHttpHeaders(credentials):
-	return {
-		'meshblu_auth_uuid': credentials.get('uuid'),
-		'meshblu_auth_token': credentials.get('token')
-	}
+def auth_http_headers(credentials):
+    return {
+        'meshblu_auth_uuid': credentials.get('uuid'),
+        'meshblu_auth_token': credentials.get('token')
+    }
 
-class Meshblu(object):
-	def __init__(self, protocol):
-		logging.info('Using protocol ' + protocol)
-		self.protocol = {
-			'socketio': lambda: ProtoSocketio(),
-			'http': lambda: ProtoHttp(headers=authHttpHeaders,
-				addDev=lambda: {'type': 'POST', 'endpoint':'/devices'},
-				listDev=lambda: {'type': 'GET', 'endpoint':'/mydevices'},
-				rmDev=lambda uuid: {'type': 'DELETE', 'endpoint':'/devices/%s' %uuid},
-				updateDev=lambda uuid: {'type': 'PUT', 'endpoint':'/devices/%s' %uuid},
-				addData=lambda uuid: {'type': 'POST', 'endpoint': '/data/%s' %uuid},
-				listData=lambda uuid: {'type': 'GET', 'endpoint': '/data/%s' %uuid},
-				subs=lambda uuid: {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid})
-		}.get(protocol.lower())()
+class Meshblu(Cloud):
+    def __init__(self, protocol):
+        logging.info('Using protocol %s', protocol)
+        self.protocol = {
+            'socketio': ProtoSocketio,
+            'http': lambda: ProtoHttp(
+                headers=auth_http_headers,
+                addDev=lambda: {'type': 'POST', 'endpoint':'/devices'},
+                listDev=lambda: {'type': 'GET', 'endpoint':'/my_devices'},
+                rmDev=lambda uuid: {'type': 'DELETE', 'endpoint':'/devices/%s' %uuid},
+                updateDev=lambda uuid: {'type': 'PUT', 'endpoint':'/devices/%s' %uuid},
+                addData=lambda uuid: {'type': 'POST', 'endpoint': '/data/%s' %uuid},
+                listData=lambda uuid: {'type': 'GET', 'endpoint': '/data/%s' %uuid},
+                subs=lambda uuid: {'type': 'GET', 'endpoint': '/subscribe/%s' %uuid})
+        }.get(protocol.lower())()
 
-	def registerDevice(self, credentials, user_data={}):
-		properties = {'type':'KNoTDevice', 'owner': credentials['uuid']}
-		properties.update(user_data)
-		try: # validate if uuid is in the right format
-			UUID(credentials.get('uuid'), version=4)
-		except ValueError as err:
-			raise ValueError('Invalid credentials: ' + str(err))
-		return omitDeviceRegisteredParameters(self.protocol.registerDevice(credentials, properties))
+    def register_device(self, credentials, user_data=None):
+        properties = {'type':'KNoTDevice', 'owner': credentials['uuid']}
+        properties.update(user_data)
+        try: # validate if uuid is in the right format
+            UUID(credentials.get('uuid'), version=4)
+        except ValueError as err:
+            raise ValueError('Invalid credentials: ' + str(err))
+        return omit_device_registered_params(self.protocol.register_device(credentials, properties))
 
-	def unregisterDevice(self, credentials, device_id, user_data={}):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		return omitDeviceParameters(handle_response_error(self.protocol.unregisterDevice(credentials, uuid, user_data)))
+    def unregister_device(self, credentials, device_id, user_data=None):
+        uuid = get_device_uuid(
+            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
+            device_id)
+        return omit_device_params(handle_response_error(self.protocol.unregister_device(credentials, uuid, user_data)))
 
-	def myDevices(self, credentials):
-		return omitDevicesParameters(handle_response_error(self.protocol.myDevices(credentials)).get('devices'))
+    def my_devices(self, credentials):
+        return omit_devices_params(handle_response_error(self.protocol.my_devices(credentials)).get('devices'))
 
-	def subscribe(self, credentials, device_id, onReceive=None):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		self.protocol.subscribe(credentials, uuid, onReceive)
+    def subscribe(self, credentials, device_id, on_receive=None):
+        uuid = get_device_uuid(
+            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
+            device_id)
+        self.protocol.subscribe(credentials, uuid, on_receive)
 
-	def update(self, credentials, device_id, user_data={}):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		properties = {'uuid': uuid}
-		properties.update(user_data)
-		return omitDeviceParameters(handle_response_error(self.protocol.update(credentials, uuid, properties)))
+    def update(self, credentials, device_id, user_data=None):
+        uuid = get_device_uuid(
+            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
+            device_id)
+        properties = {'uuid': uuid}
+        properties.update(user_data)
+        return omit_device_params(handle_response_error(self.protocol.update(credentials, uuid, properties)))
 
-	def getData(self, credentials, device_id, **kwargs):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		return self.protocol.getData(credentials, uuid, **kwargs)
+    def get_data(self, credentials, device_id, **kwargs):
+        uuid = get_device_uuid(
+            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
+            device_id)
+        return self.protocol.get_data(credentials, uuid, **kwargs)
 
-	def postData(self, credentials, device_id, user_data={}):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		properties = {'uuid': uuid}
-		properties.update(user_data)
-		return self.protocol.postData(credentials, uuid, properties)
+    def post_data(self, credentials, device_id, user_data=None):
+        uuid = get_device_uuid(
+            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
+            device_id)
+        properties = {'uuid': uuid}
+        properties.update(user_data)
+        return self.protocol.post_data(credentials, uuid, properties)
 
-	def listSensors(self, credentials, device_id):
-		devices = ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']})
-		uuid = getDeviceUuid(devices, device_id)
-		schema = [dev.get('schema') for dev in devices if dev.get('uuid') == uuid][0]
-		try:
-			return [sensor.get('sensor_id') for sensor in schema]
-		except KeyError as err:
-			return []
+    def list_sensors(self, credentials, device_id):
+        devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
+        uuid = get_device_uuid(devices, device_id)
+        schema = [dev.get('schema') for dev in devices if dev.get('uuid') == uuid][0]
+        try:
+            return [sensor.get('sensor_id') for sensor in schema]
+        except KeyError:
+            return []
 
-	def getSensorDetails(self, credentials, device_id, sensor_id):
-		deviceSchema = []
-		devices = ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']})
-		uuid = getDeviceUuid(devices, device_id)
-		try:
-			deviceSchema = [dev for dev in devices if dev.get('uuid') == uuid][0]['schema']
-		except Exception as err:
-			raise Exception('None sensor is registered in this thing')
+    @classmethod
+    def get_sensor_details(cls, credentials, device_id, sensor_id):
+        device_schema = []
+        devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
+        uuid = get_device_uuid(devices, device_id)
+        try:
+            device_schema = [dev for dev in devices if dev.get('uuid') == uuid][0]['schema']
+        except Exception:
+            raise Exception('None sensor is registered in this thing')
 
-		if len(deviceSchema) > 0:
-			try:
-				return [sensor for sensor in deviceSchema if sensor.get('sensor_id') == sensor_id][0]
-			except IndexError as err:
-				raise Exception('This thing has not this sensor id')
-		else:
-			raise Exception('None sensor is registered in this thing')
+        if device_schema:
+            try:
+                return [sensor for sensor in device_schema if sensor.get('sensor_id') == sensor_id][0]
+            except IndexError:
+                raise Exception('This thing has not this sensor id')
+        else:
+            raise Exception('None sensor is registered in this thing')
 
-	def getThings(self, credentials, gateways=['*']):
-		logging.warn('This function is using protocol socketio')
-		properties = {
-			'gateways': gateways
-		}
-		return omitDevicesParameters(handle_response_error(ProtoSocketio().getDevices(credentials, properties)))
+    def get_things(self, credentials, gateways=None):
+        logging.warning('This function is using protocol socketio')
+        properties = {
+            'gateways': gateways or ['*']
+        }
+        return omit_devices_params(handle_response_error(ProtoSocketio().getDevices(credentials, properties)))
 
-	def setData(self, credentials, device_id, sensor_id, value):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		properties = {
-			'set_data': [{
-				'sensor_id': sensor_id,
-				'value': value
-				}]
-		}
-		return omitDeviceParameters(handle_response_error(ProtoSocketio().update(credentials, uuid, properties)))
+    def set_data(self, credentials, device_id, sensor_id, value):
+        uuid = get_device_uuid(
+            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
+            device_id)
+        properties = {
+            'set_data': [{
+                'sensor_id': sensor_id,
+                'value': value
+                }]
+        }
+        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, uuid, properties)))
 
-	def requestData(self, credentials, device_id, sensor_id):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		properties = {
-			'get_data': [{
-				'sensor_id': sensor_id
-				}]
-		}
-		return omitDeviceParameters(handle_response_error(ProtoSocketio().update(credentials, uuid, properties)))
+    def request_data(self, credentials, device_id, sensor_id):
+        uuid = get_device_uuid(
+            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
+            device_id)
+        properties = {
+            'get_data': [{
+                'sensor_id': sensor_id
+                }]
+        }
+        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, uuid, properties)))
 
-	def setConfig(self, credentials, device_id, sensor_id, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
-		uuid = getDeviceUuid(ProtoSocketio().getDevices(credentials,
-							{'gateways': ['*']}), device_id)
-		properties = {
-			'config': [{
-				'sensor_id': sensor_id,
-				'event_flags': eventFlags,
-				'time_sec': timeSec,
-				'lower_limit': lowerLimit,
-				'upper_limit': upperLimit
-				}]
-		}
-		return omitDeviceParameters(handle_response_error(ProtoSocketio().update(credentials, uuid, properties)))
+    def send_config(self, credentials, device_id, sensor_id, event_flags=FLAG_CHANGE, **kwargs):
+        time_sec = kwargs.get('time_sec')
+        lower_limit = kwargs.get('lower_limit')
+        upper_limit = kwargs.get('upper_limit')
+        uuid = get_device_uuid(
+            ProtoSocketio().getDevices(credentials, {'gateways': ['*']}),
+            device_id)
+        properties = {
+            'config': [{
+                'sensor_id': sensor_id,
+                'event_flags': event_flags,
+                'time_sec': time_sec,
+                'lower_limit': lower_limit,
+                'upper_limit': upper_limit
+                }]
+        }
+        return omit_device_params(handle_response_error(ProtoSocketio().update(credentials, uuid, properties)))

@@ -19,7 +19,7 @@ class KnotConnection():
         Unregister a device with the credentials passed by the dict/json
         parameter and return the successed json message
         '''
-        return self.cloud.unregisterDevice(self.credentials, device_id, user_data)
+        return self.cloud.unregister_device(self.credentials, device_id, user_data)
 
     def subscribe(self, device_id, on_receive=None):
         '''
@@ -40,7 +40,7 @@ class KnotConnection():
         conn.get_data(thing_uuid, limit=1) # get most recent data from your sensor
         conn.get_data(thing_uuid, finish='2018/03/15') # get data the 10 data from until this date
         '''
-        result = self.cloud.getData(self.credentials, device_id, **kwargs)
+        result = self.cloud.get_data(self.credentials, device_id, **kwargs)
         data = result.get('data')
         return data
 
@@ -48,31 +48,31 @@ class KnotConnection():
         '''
         Return a list of sensors from the thing_uuid
         '''
-        return self.cloud.listSensors(self.credentials, device_id)
+        return self.cloud.list_sensors(self.credentials, device_id)
 
     def get_sensor_details(self, device_id, sensor_id):
         '''
         Return a detailed list of sensor_id
         '''
-        return self.cloud.getSensorDetails(self.credentials, device_id, sensor_id)
+        return self.cloud.get_sensor_details(self.credentials, device_id, sensor_id)
 
     def get_devices(self):
         '''
         Get the devices of your user
         '''
-        return self.cloud.getThings(self.credentials)
+        return self.cloud.get_things(self.credentials)
 
     def set_data(self, device_id, sensor_id, value):
         '''
         Set data of the sensor from your thing
         '''
-        return self.cloud.setData(self.credentials, device_id, sensor_id, value)
+        return self.cloud.set_data(self.credentials, device_id, sensor_id, value)
 
     def request_data(self, device_id, sensor_id):
         '''
         Force your thing to post sensor data indepent of your configuration
         '''
-        return self.cloud.requestData(self.credentials, device_id, sensor_id)
+        return self.cloud.request_data(self.credentials, device_id, sensor_id)
 
     def send_config(self, device_id, sensor_id, event_flags=FLAG_CHANGE, **kwargs):
         '''
@@ -88,5 +88,5 @@ class KnotConnection():
         lower_limit = kwargs.get('lower_limit')
         upper_limit = kwargs.get('upper_limit')
         handle_evt_flag_error(event_flags, time_sec, lower_limit, upper_limit)
-        return self.cloud.setConfig(self.credentials, device_id, sensor_id,
-                                    event_flags, time_sec, lower_limit, upper_limit)
+        return self.cloud.send_config(self.credentials, device_id, sensor_id,
+                                      event_flags, **kwargs)

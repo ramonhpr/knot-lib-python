@@ -53,10 +53,10 @@ Create a client object that will connect to a KNoT Cloud instance.
 * `credentials` **dict** The credentials used to authenticate with each cloud
   * `servername` **string** Cloud instance hostname
   * `port` **int** Cloud instance port
-  * [`uuid`] **string** uuid of meshblu user
-  * [`token`] **string** token of meshblu user
+  * [`uuid`] **string** uuid of Meshblu user
+  * [`token`] **string** token of Meshblu user
 * `cloud` **string** One of the cloud supported by KNoT platform.
-Default: Meshblu .Supports: ['Meshblu', 'Fiware']
+Default: Meshblu .Supports: ['meshblu', 'Fiware']
 * `protocol` **string** One of the protocol supported.
 Default: Socket.IO. Supports: ['http', 'socketio']
 
@@ -98,7 +98,7 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  myDevices = conn.get_devices()
+  my_devices = conn.get_devices()
 except Exception as err:
   print(err)
 # [ { online: true,
@@ -207,7 +207,7 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  myDevices = conn.get_data('7e133545550e496a')
+  my_devices = conn.get_data('7e133545550e496a')
 except Exception as err:
   print(err)
 # [ { data: { sensor_id: 2, value: 0 },
@@ -236,12 +236,12 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  myDevices = conn.set_data('7e133545550e496a', 1, True)
+  my_devices = conn.set_data('7e133545550e496a', 1, True)
 except Exception as err:
   print(err)
 ```
 
-### requestData(id, sensorId)
+### request_data(id, sensorId)
 Requests the device to publish its current value of a sensor. The value can be retrieved using `get_data()` or by listening to device updates.
 
 ##### Argument
@@ -260,7 +260,7 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  myDevices = conn.requestData('7e133545550e496a', 1)
+  my_devices = conn.request_data('7e133545550e496a', 1)
 except Exception as err:
   print(err)
 ```
@@ -295,7 +295,7 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  myDevices = conn.send_config('7e133545550e496a', 1, event_flag=FLAG_TIME+FLAG_CHANGE, time_sec=30)
+  my_devices = conn.send_config('7e133545550e496a', 1, event_flag=FLAG_TIME+FLAG_CHANGE, time_sec=30)
 except Exception as err:
   print(err)
 ```
@@ -330,7 +330,7 @@ def callback(event):
   print(event)
 
 try:
-  myDevices = conn.subscribe('7e133545550e496a', callback)
+  my_devices = conn.subscribe('7e133545550e496a', callback)
 except Exception as err:
   print(err)
 # { data: { sensor_id: 2, value: 21 },
