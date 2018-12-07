@@ -2,7 +2,7 @@ import logging
 from uuid import UUID
 from .proto_http import ProtoHttp
 from .Cloud import Cloud
-from .handler import handleFiwareResponse
+from .handler import handle_fiware_response
 __all__=[]
 
 def _omit(json, arr):
@@ -73,13 +73,13 @@ class Fiware(Cloud):
 	def unregisterDevice(self, credentials, uuid, user_data={}):
 		orionResponse = self.protocol.unregisterDevice(credentials, uuid, user_data)
 		if orionResponse:
-			return handleFiwareResponse(orionResponse)
+			return handle_fiware_response(orionResponse)
 
 		tmpProtocol = self.protocol
 		tmpProtocol.rmDev = lambda device: {'type': 'DELETE', 'endpoint': '/iot/devices/%s' %device}
 		iotagentResponse = tmpProtocol.unregisterDevice({'servername': credentials['servername'], 'port': 4041}, uuid)
 		if iotagentResponse:
-			return handleFiwareResponse(iotagentResponse)
+			return handle_fiware_response(iotagentResponse)
 
 	def update(self, credentials, uuid, user_data={}):
 		body = {
@@ -100,7 +100,7 @@ class Fiware(Cloud):
 			"updateAction": "UPDATE"
 		}
 		response = self.protocol.update(credentials, uuid, body).get('contextResponses')
-		return handleFiwareResponse(response)
+		return handle_fiware_response(response)
 
 	def listSensors(self, credentials, thing_uuid):
 		body = {
@@ -119,7 +119,7 @@ class Fiware(Cloud):
 				devices = omitDevicesParameters(response.get('contextResponses'))
 				return [{ 'id': sensor.get('id'), 'name': sensor.get('name') } for sensor in devices]
 			else:
-				return handleFiwareResponse(response)
+				return handle_fiware_response(response)
 		except KeyError:
 			return []
 		except Exception as err:
@@ -144,7 +144,7 @@ class Fiware(Cloud):
 				devices = omitDevicesParameters(response.get('contextResponses'))
 				return [sensor for sensor in devices]
 			else:
-				return handleFiwareResponse(response)
+				return handle_fiware_response(response)
 		except KeyError:
 			return []
 		except Exception as err:
@@ -190,7 +190,7 @@ class Fiware(Cloud):
 		}
 		credentials['id'] = thing_uuid
 		response = self.protocol.update(credentials, thing_uuid, body).get('contextResponses')
-		return handleFiwareResponse(response)
+		return handle_fiware_response(response)
 
 	def setConfig(self, credentials, thing_uuid, sensor_id,
 					eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0):
@@ -220,7 +220,7 @@ class Fiware(Cloud):
 		}
 		credentials['id'] = thing_uuid
 		response = self.protocol.update(credentials, thing_uuid, body).get('contextResponses')
-		return handleFiwareResponse(response)
+		return handle_fiware_response(response)
 
 	def getData(self, credentials, thing_uuid, **kwargs):
 		logging.error('Missing implementation')
@@ -254,4 +254,4 @@ class Fiware(Cloud):
 		}
 		credentials['id'] = thing_uuid
 		response = self.protocol.update(credentials, thing_uuid, body).get('contextResponses')
-		return handleFiwareResponse(response)
+		return handle_fiware_response(response)

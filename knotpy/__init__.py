@@ -4,43 +4,47 @@ This API can access the meshblu and find data about KNoT devices
 by a simple client connection.
 
 KNoT can now support two protocol to get data from things:
-	- http
-	- socketio
+    - http
+    - socketio
 
 In KNoT webui you can find your credentials
 See an example:
 > from knotpy import KnotConnection
 > credentials = {
-	'servername': '<your_local_IP>/<raspberry_IP>',
-	'port': 3000,
-	'uuid': <user_uuid>,
-	'token': <user_token>
+    'servername': '<your_local_IP>/<raspberry_IP>',
+    'port': 3000,
+    'uuid': <user_uuid>,
+    'token': <user_token>
 }
 > conn = KnotConnection(credentials, protocol='http')
-> myThings = conn.getThings()
+> my_things = conn.get_devices()
 
-`myThings` is an array with the things that is online and offline in your gateway
+`my_things` is an array with the things that is online and offline in your gateway
 This things have informations like your id, if they are online or no, and the
 sensors of this things.
 '''
-from .knot import KnotConnection
-from .evt_flag import *
 import logging as _logging
 import sys as _sys
 import os as _os
-__flag_list = [
-	'FLAG_TIME',
-	'FLAG_LOWER',
-	'FLAG_UPPER',
-	'FLAG_CHANGE',
-	'FLAG_MAX'
+from .knot import KnotConnection
+from .evt_flag import FLAG_TIME, FLAG_LOWER, FLAG_UPPER, FLAG_CHANGE, FLAG_MAX
+EXPORTED_FLAGS = [
+    'FLAG_TIME',
+    'FLAG_LOWER',
+    'FLAG_UPPER',
+    'FLAG_CHANGE',
+    'FLAG_MAX'
 ]
-__all__ = ['KnotConnection'] +__flag_list
+__all__ = ['KnotConnection'] + EXPORTED_FLAGS
 __version__ = 1.2
 if _os.environ.get('DEBUG'):
-	_logging.basicConfig(format='On file: %(pathname)s\n[%(levelname)s] %(funcName)s: %(message)s\n', stream=_sys.stderr, level=_logging.DEBUG)
+    _logging.basicConfig(
+        format='On file: %(pathname)s\n[%(levelname)s] %(funcName)s: %(message)s\n',
+        stream=_sys.stderr,
+        level=_logging.DEBUG)
 elif _os.environ.get('INFO'):
-	_logging.basicConfig(format='[%(levelname)s] %(funcName)s: %(message)s\n', stream=_sys.stderr, level=_logging.INFO)
+    _logging.basicConfig(format='[%(levelname)s] %(funcName)s: %(message)s\n',
+                         stream=_sys.stderr, level=_logging.INFO)
 else:
-	_logging.basicConfig(format='[%(levelname)s] %(funcName)s: %(message)s\n', stream=_sys.stderr)
-
+    _logging.basicConfig(format='[%(levelname)s] %(funcName)s: %(message)s\n',
+                         stream=_sys.stderr)
