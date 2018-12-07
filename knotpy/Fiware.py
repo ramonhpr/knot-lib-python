@@ -39,6 +39,23 @@ def omitDevicesParameters(devices):
 
 	return devices
 
+def getContextElement(device)
+		device = device.get('contextElement')
+		device.update(parseAttributes(device.get('attributes')))
+		return device
+
+def prettify(func):
+	def decorator_prettify(func):
+		json = func(self, *args, **args)
+		if isinstance(json, list):
+			for i, dev in enumerate(json):
+				json[i] = getContextElement(dev)
+			return json
+		else:
+			return getContextElement(dev)
+
+	return decorator_prettify
+
 def authHttpHeaders(credentials):
 	return {
 		'fiware-service': "knot",
@@ -150,7 +167,7 @@ class Fiware(Cloud):
 		except Exception as err:
 			raise err
 
-
+	@prettify
 	def getThings(self, credentials, gateways=['*']):
 		body = {
 			'entities': [
@@ -163,7 +180,7 @@ class Fiware(Cloud):
 		}
 		response = self.protocol.myDevices(credentials, body).get('contextResponses')
 		if response:
-			return omitDevicesParameters(response)
+			return response
 		else:
 			raise Exception('Devices not found')
 
