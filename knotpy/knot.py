@@ -2,7 +2,7 @@
 KNoT Lib Python
 '''
 from .cloud_factory import CloudFactory
-from .handler import handleEvtFlagError
+from .handler import handle_evt_flag_error
 from .evt_flag import FLAG_CHANGE
 __all__ = ['KnotConnection']
 
@@ -87,6 +87,6 @@ class KnotConnection():
         time_sec = kwargs.get('time_sec')
         lower_limit = kwargs.get('lower_limit')
         upper_limit = kwargs.get('upper_limit')
-        handleEvtFlagError(event_flags, time_sec, lower_limit, upper_limit)
+        handle_evt_flag_error(event_flags, time_sec, lower_limit, upper_limit)
         return self.cloud.setConfig(self.credentials, device_id, sensor_id,
                                     event_flags, time_sec, lower_limit, upper_limit)
