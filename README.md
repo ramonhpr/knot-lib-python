@@ -39,7 +39,7 @@ In KNoT webui you can find your credentials
             'token': '0bd12a4c31de141909c3dd955d6b881d5ca5fa5b'
     }
     conn = KnotConnection(credentials)
-    myThings = conn.getDevices()
+    myThings = conn.get_devices()
 ```
 
 ## Objects
@@ -75,7 +75,7 @@ conn = KnotConnection(credentials)
 
 ## Methods
 
-### getDevices():list
+### get_devices():list
 
 Gets the devices associated to the connected user.
 
@@ -98,7 +98,7 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  myDevices = conn.getDevices()
+  myDevices = conn.get_devices()
 except Exception as err:
   print(err)
 # [ { online: true,
@@ -107,7 +107,7 @@ except Exception as err:
 #    schema: [ [Object], [Object] ] } ]
 ```
 
-### listSensors(id):list
+### list_sensors(id):list
 List the sensor by a device identified by id.
 
 #### Arguments
@@ -128,13 +128,13 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  sensors = conn.listSensors('7e133545550e496a')
+  sensors = conn.list_sensors('7e133545550e496a')
 except Exception as err:
   print(err)
 # [1,2]
 ```
 
-### getSensorDetails(id, sensorId):dict
+### get_sensor_details(id, sensorId):dict
 Gets the sensor details from a specific sensor identified.
 
 #### Argument
@@ -161,9 +161,9 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  sensors = conn.listSensors('7e133545550e496a')
+  sensors = conn.list_sensors('7e133545550e496a')
   for sensor_id in sensors:
-    print(conn.getSensorDetails('7e133545550e496a', sensor_id))
+    print(conn.get_sensor_details('7e133545550e496a', sensor_id))
 except Exception as err:
   print(err)
 # { sensor_id: 1,
@@ -177,7 +177,7 @@ except Exception as err:
 #   type_id: 9,
 #   name: 'Card reader' }
 ```
-### getData(id[,limit=10, start, finish]):list
+### get_data(id[,limit=10, start, finish]):list
 
 Gets the last 10 data items published by the device identified by id.
 
@@ -207,7 +207,7 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  myDevices = conn.getData('7e133545550e496a')
+  myDevices = conn.get_data('7e133545550e496a')
 except Exception as err:
   print(err)
 # [ { data: { sensor_id: 2, value: 0 },
@@ -216,7 +216,7 @@ except Exception as err:
 #     timestamp: '2018-08-25T05:29:43.520Z' },
 #     ... ]
 ```
-### setData(id, sensorId, value)
+### set_data(id, sensorId, value)
 Sets a value to a sensor.
 
 ##### Argument
@@ -236,13 +236,13 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  myDevices = conn.setData('7e133545550e496a', 1, True)
+  myDevices = conn.set_data('7e133545550e496a', 1, True)
 except Exception as err:
   print(err)
 ```
 
 ### requestData(id, sensorId)
-Requests the device to publish its current value of a sensor. The value can be retrieved using `getData()` or by listening to device updates.
+Requests the device to publish its current value of a sensor. The value can be retrieved using `get_data()` or by listening to device updates.
 
 ##### Argument
 
@@ -265,7 +265,7 @@ except Exception as err:
   print(err)
 ```
 
-### sendConfig(id, sensorId[, eventFlags=8, timeSec=0, lowerLimit=0, upperLimit=0])
+### send_config(id, sensorId[, event_flags=8, time_sec=0, lower_limit=0, upper_limit=0])
 Send configuration from the sensor of your thing if it is online
 
 
@@ -273,16 +273,16 @@ Send configuration from the sensor of your thing if it is online
 
 * `id` **String** device ID (KNoT ID).
 * `sensorId` **String** sensor ID.
-* `eventFlags` **int**
+* `event_flags` **int**
 You can use the event flags macro bellow:
   * `FLAG_TIME`: Send data every period of time, in seconds. Needs a value greater than 0 to be passed on time_sec
   * `FLAG_LOWER`: Send data every time that the item is below a threshold. The value to be compared with is the one passed on lower_limit. If combined with `FLAG_UPPER`, **it is mandatory that lower_limit is smaller than upper_limit**.
-  * `FLAG_UPPER`: Send data every time that the item is above a threshold. The value to be compared with is the one passed on upper_limit. If combined with `FLAG_LOWER`, **it is mandatory that lowerLimit is smaller than upperLimit**.
+  * `FLAG_UPPER`: Send data every time that the item is above a threshold. The value to be compared with is the one passed on upper_limit. If combined with `FLAG_LOWER`, **it is mandatory that lower_limit is smaller than upper_limit**.
   * `FLAG_CHANGE`: Send data every time the item changes its value. Does not require any additional field.
   * `FLAG_MAX`: Send all the other above
-* `timeSec` **int** the time in seconds when a sensor will publish a data. If `FLAG_TIME` is set, this field is mandatory
-* `lowerLimit` **int** the threshold value when a sensor will publish bellow this value. If `FLAG_LOWER` is set, this field is mandatory
-* `upperLimit` **int** the threshold value when a sensor will publish above this value. If `FLAG_UPPER` is set, this field is mandatory
+* `time_sec` **int** the time in seconds when a sensor will publish a data. If `FLAG_TIME` is set, this field is mandatory
+* `lower_limit` **int** the threshold value when a sensor will publish bellow this value. If `FLAG_LOWER` is set, this field is mandatory
+* `upper_limit` **int** the threshold value when a sensor will publish above this value. If `FLAG_UPPER` is set, this field is mandatory
 
 #####  Example
 ```python
@@ -295,19 +295,19 @@ credentials = {
 }
 conn = KnotConnection(credentials)
 try:
-  myDevices = conn.sendConfig('7e133545550e496a', 1, eventFlag=FLAG_TIME+FLAG_CHANGE, timeSec=30)
+  myDevices = conn.send_config('7e133545550e496a', 1, event_flag=FLAG_TIME+FLAG_CHANGE, time_sec=30)
 except Exception as err:
   print(err)
 ```
 
-### subscribe(id, onReceive)
+### subscribe(id, on_receive)
 
 Subscribes to data published by a device identified by id. To listen to the publish events, register a callback in parameter onReceive.
 
 #### Argument
 
 * `id` **string**
-* `onReceive` **function** Callback function called with device updates. Receives:
+* `on_receive` **function** Callback function called with device updates. Receives:
   * `event` **dict** published event, object in the following format:
     * `source` **String** device ID (KNoT ID).
     * `data` **dict** data published by the device, in the following format:
