@@ -4,7 +4,7 @@ from .evt_flag import FLAG_CHANGE
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
 from .handler import handle_response_error
-from .Cloud import Cloud
+from .cloud import Cloud
 __all__ = []
 
 def _omit(json, arr):

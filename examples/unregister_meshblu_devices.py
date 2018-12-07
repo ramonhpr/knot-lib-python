@@ -1,4 +1,4 @@
-from knotpy.Meshblu import Meshblu
+from knotpy.meshblu import Meshblu
 from credentials import *
 
 knot = Meshblu('http')
