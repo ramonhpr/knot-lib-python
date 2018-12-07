@@ -58,17 +58,17 @@ class ProtoHttp(Protocol):
 			logging.info('response_text-> ' + str(response.text))
 			return response.text
 
-	def registerDevice(self, credentials, user_data={}):
+	def register_device(self, credentials, user_data={}):
 		url = self.__parseUrl(credentials) + self.addDev()['endpoint']
 		typeReq = self.addDev()['type'].upper()
 		return self.__doRequest(self.cloudHeaders(credentials), url, typeReq, user_data)
 
-	def unregisterDevice(self, credentials, device_id, user_data={}):
+	def unregister_device(self, credentials, device_id, user_data={}):
 		url = self.__parseUrl(credentials) + self.rmDev(device_id)['endpoint']
 		typeReq = self.rmDev(device_id)['type'].upper()
 		return self.__doRequest(self.cloudHeaders(credentials), url, typeReq, user_data)
 
-	def myDevices(self, credentials, user_data={}):
+	def my_devices(self, credentials, user_data={}):
 		url = self.__parseUrl(credentials) + self.listDev()['endpoint']
 		typeReq = self.listDev()['type'].upper()
 		return self.__doRequest(self.cloudHeaders(credentials), url, typeReq, user_data)
@@ -92,12 +92,12 @@ class ProtoHttp(Protocol):
 		typeReq = self.updateDev(device_id)['type'].upper()
 		return self.__doRequest(self.cloudHeaders(credentials), url, typeReq, user_data)
 
-	def getData(self, credentials, device_id, **kwargs):
+	def get_data(self, credentials, device_id, **kwargs):
 		url = self.__parseUrl(credentials) + self.listData(device_id)['endpoint']
 		typeReq = self.listData(device_id)['type'].upper()
 		return self.__doRequest(self.cloudHeaders(credentials), url, typeReq, kwargs)
 
-	def postData(self, credentials, device_id, user_data={}):
+	def post_data(self, credentials, device_id, user_data={}):
 		url = self.__parseUrl(credentials) + self.addData(device_id)['endpoint']
 		typeReq = self.addData(device_id)['type'].upper()
 		return self.__doRequest(self.cloudHeaders(credentials), url, typeReq, user_data)
