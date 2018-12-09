@@ -1,5 +1,11 @@
 import os
 from setuptools import setup
+from setuptools.command.develop import develop
+
+class PostInstall(develop):
+    def run(self):
+        develop.run(self)
+        os.system('pre-commit install')
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -18,6 +24,13 @@ setup(
     keywords="IoT dataAnalytics API web",
     url="https://github.com/ramonhpr/knot-lib-python",
     install_requires=['socketIO_client'],
+    extras_require={
+        'dev': [
+            'pylint',
+            'pre-commit'
+        ]
+    },
+    cmdclass={'develop': PostInstall},
     packages=['knotpy'],
     long_description=read('README.md'),
     classifiers=[
