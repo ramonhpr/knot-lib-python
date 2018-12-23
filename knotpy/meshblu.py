@@ -126,29 +126,23 @@ class Meshblu(Cloud):
     def list_sensors(self, credentials, device_id):
         devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
         uuid = get_device_uuid(devices, device_id)
-        schema = [dev.get('schema') for dev in devices if dev.get('uuid') == uuid][0]
         try:
-            return [sensor.get('sensor_id') for sensor in schema]
+            device = [dev for dev in devices if dev.get('uuid') == uuid][0]
+            return [sensor.get('sensor_id') for sensor in device['schema']]
         except KeyError:
             return []
 
     @classmethod
     def get_sensor_details(cls, credentials, device_id, sensor_id):
-        device_schema = []
         devices = ProtoSocketio().getDevices(credentials, {'gateways': ['*']})
         uuid = get_device_uuid(devices, device_id)
         try:
-            device_schema = [dev for dev in devices if dev.get('uuid') == uuid][0]['schema']
-        except Exception:
+            device = [dev for dev in devices if dev.get('uuid') == uuid][0]
+            return [i for i in device['schema'] if i.get('sensor_id') == sensor_id][0]
+        except KeyError:
             raise Exception('None sensor is registered in this thing')
-
-        if device_schema:
-            try:
-                return [sensor for sensor in device_schema if sensor.get('sensor_id') == sensor_id][0]
-            except IndexError:
-                raise Exception('This thing has not this sensor id')
-        else:
-            raise Exception('None sensor is registered in this thing')
+        except IndexError:
+            raise Exception('This thing has not this sensor_id %s' %sensor_id)
 
     def get_things(self, credentials, gateways=None):
         logging.warning('This function is using protocol socketio')
