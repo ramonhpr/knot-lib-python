@@ -133,8 +133,8 @@ class ProtoSocketio(Protocol):
     def register_device(self, credentials, user_data=None):
         return self.__signin_emit(credentials, 'register', user_data)
 
-    def unregister_device(self, device_id, credentials, properties=None):
-        return self.__signin_emit(credentials, 'unregister', properties)
+    def unregister_device(self, credentials, device_id, user_data=None):
+        return self.__signin_emit(credentials, 'unregister', user_data)
 
     def subscribe(self, credentials, device_id, on_receive=None):
         return self.__signin_emit(credentials, 'subscribe',
