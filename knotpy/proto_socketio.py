@@ -154,6 +154,6 @@ class ProtoSocketio(Protocol):
             'target': device_id,
             'limit': kwargs.get('limit'),
             'start': kwargs.get('start'),
-            'stop': kwargs.get('stop')
+            'finish': kwargs.get('finish')
         })
         return self.__signin_emit(credentials, 'getdata', kwargs)
