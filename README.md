@@ -16,6 +16,10 @@ $ virtualenv ~/envname
 $ . ~/envname/bin/activate
 $ pip install .
 ```
+
+### Install for contributting
+`pip install -e .['dev']`
+
 ## Quick Start
 This API can access the cloud selected in platform KNoT and find data about KNoT devices by a simple client connection.
 
