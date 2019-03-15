@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "knotpy",
-    version = "1.2",
+    version = "1.2.1",
     author = "Ramon Ribeiro",
     author_email = "rhpr@cesar.org.br",
     description = ("API to access data from knot devices"),
