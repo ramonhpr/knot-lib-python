@@ -1,4 +1,4 @@
-class Protocol():
+class Protocol(object):
     def register_device(self, credentials, user_data=None):
         pass
     def unregister_device(self, credentials, device_id, user_data=None):

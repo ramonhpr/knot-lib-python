@@ -2,7 +2,7 @@ import logging
 from .meshblu import Meshblu
 from .fiware import Fiware
 
-class CloudFactory():
+class CloudFactory(object):
     @staticmethod
     def init(platform, protocol):
         logging.info('Selecting cloud %s', platform)

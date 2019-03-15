@@ -90,7 +90,9 @@ class Meshblu(Cloud):
     @omit(DEVICE_PARAMS)
     @can_convert_to_uuid
     def unregister_device(self, credentials, device_id, user_data=None):
-        return handle_response_error(self.protocol.unregister_device(credentials, device_id, user_data))
+        return handle_response_error(
+            self.protocol.unregister_device(credentials, device_id, user_data)
+        )
 
     @omit(DEVICE_PARAMS)
     def my_devices(self, credentials):

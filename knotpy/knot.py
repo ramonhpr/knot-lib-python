@@ -6,7 +6,7 @@ from .handler import handle_evt_flag_error
 from .evt_flag import FLAG_CHANGE
 __all__ = ['KnotConnection']
 
-class KnotConnection():
+class KnotConnection(object):
     '''This is the main class to connect to KNoT Cloud
     KnotConnection(credentials, protocol='http')
     '''

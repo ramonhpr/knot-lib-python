@@ -44,7 +44,8 @@ def omit_devices_parameters(devices):
 def auth_http_headers(credentials):
     return {
         'fiware-service': "knot",
-        'fiware-servicepath': "/device/%s" %credentials.get('id') if credentials.get('id') else '/device',
+        'fiware-servicepath': "/device/%s" %credentials.get('id')
+                              if credentials.get('id') else '/device',
     }
 
 class Fiware(Cloud):
@@ -59,7 +60,9 @@ class Fiware(Cloud):
                 rm_dev=lambda device: {'type': 'DELETE', 'endpoint':'/v2/entities/%s' %device},
                 update_dev=lambda: {'type': 'POST', 'endpoint':'/v1/updateContext'},
                 add_data=lambda device: {'type': 'POST', 'endpoint': '/data/%s' %device},
-                list_data=lambda device: {'type': 'GET', 'endpoint': '/v2/entities/%s?options=keyValues' %device},
+                list_data=lambda device: {
+                    'type': 'GET',
+                    'endpoint': '/v2/entities/%s?options=keyValues' %device},
                 subs=lambda: {'type': 'POST', 'endpoint': 'v2/subscriptions'})
         }.get(protocol.lower())
 
@@ -74,8 +77,12 @@ class Fiware(Cloud):
             raise err
 
         tmp_protocol = self.protocol
-        tmp_protocol.rm_dev = lambda device: {'type': 'DELETE', 'endpoint': '/iot/devices/%s' %device}
-        iotagent_response = tmp_protocol.unregister_device({'servername': credentials['servername'], 'port': 4041}, device_id)
+        tmp_protocol.rm_dev = lambda device: {
+            'type': 'DELETE',
+            'endpoint': '/iot/devices/%s' %device}
+        iotagent_response = tmp_protocol.unregister_device({
+            'servername': credentials['servername'],
+            'port': 4041}, device_id)
         try:
             return handle_fiware_response(iotagent_response)
         except Exception as err:
