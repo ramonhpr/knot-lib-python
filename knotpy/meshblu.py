@@ -1,10 +1,8 @@
 import logging
 import functools
 from uuid import UUID
-from .evt_flag import FLAG_CHANGE
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
-from .handler import handle_response_error
 from .cloud import Cloud
 from .decorators import omit
 __all__ = []
@@ -55,6 +53,22 @@ def auth_http_headers(credentials):
         'meshblu_auth_uuid': credentials.get('uuid'),
         'meshblu_auth_token': credentials.get('token')
     }
+
+def handle_response_error(res):
+    if isinstance(res, dict):
+        if res.get('error'):
+            if isinstance(res.get('error'), dict):
+                raise Exception(res.get('error').get('message'))
+            elif isinstance(res, dict) and res.get('Error'):
+                raise Exception(res.get('Error'))
+            else:
+                raise Exception(res.get('error'))
+        elif res.get('code') == 404 or res.get('code') == 401:
+            raise Exception(res.get('message'))
+        else:
+            return res
+    else:
+        return res
 
 class Meshblu(Cloud):
     use_parent_conn = False
@@ -174,7 +188,7 @@ class Meshblu(Cloud):
 
     @can_convert_to_uuid
     @omit(DEVICE_PARAMS)
-    def send_config(self, credentials, device_id, sensor_id, event_flags=FLAG_CHANGE, **kwargs):
+    def send_config(self, credentials, device_id, sensor_id, event_flags, **kwargs):
         time_sec = kwargs.get('time_sec')
         lower_limit = kwargs.get('lower_limit')
         upper_limit = kwargs.get('upper_limit')

@@ -1,5 +1,3 @@
-from .evt_flag import FLAG_CHANGE
-
 class Cloud(object):
     def register_device(self, credentials, user_data=None):
         pass
@@ -25,5 +23,5 @@ class Cloud(object):
         pass
     def request_data(self, credentials, device_id, sensor_id):
         pass
-    def send_config(self, credentials, device_id, sensor_id, event_flags=FLAG_CHANGE, **kwargs):
+    def send_config(self, credentials, device_id, sensor_id, event_flags, **kwargs):
         pass

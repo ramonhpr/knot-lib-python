@@ -1,8 +1,6 @@
 import logging
-from .evt_flag import FLAG_CHANGE
 from .proto_http import ProtoHttp
 from .cloud import Cloud
-from .handler import handle_fiware_response
 __all__ = []
 
 def _omit(json, arr):
@@ -48,6 +46,19 @@ def auth_http_headers(credentials):
                               if credentials.get('id') else '/device',
     }
 
+def handle_response(response):
+    if response:
+        if response.get('errorCode'):
+            raise Exception(response.get('errorCode').get('reasonPhrase'))
+        elif response.get('statusCode'):
+            if response[0].get('statusCode').get('code') != '200':
+                raise Exception(response[0].get('statusCode').get('reasonPhrase'))
+            return response[0].get('contextElement')
+        else:
+            return response
+    else:
+        return response
+
 class Fiware(Cloud):
     def __init__(self, protocol):
         logging.info('Using protocol %s', protocol)
@@ -72,7 +83,7 @@ class Fiware(Cloud):
     def unregister_device(self, credentials, device_id, user_data=None):
         orion_response = self.protocol.unregister_device(credentials, device_id, user_data)
         try:
-            return handle_fiware_response(orion_response)
+            return handle_response(orion_response)
         except Exception as err:
             raise err
 
@@ -84,7 +95,7 @@ class Fiware(Cloud):
             'servername': credentials['servername'],
             'port': 4041}, device_id)
         try:
-            return handle_fiware_response(iotagent_response)
+            return handle_response(iotagent_response)
         except Exception as err:
             raise err
 
@@ -107,7 +118,7 @@ class Fiware(Cloud):
             "updateAction": "UPDATE"
         }
         response = self.protocol.update(credentials, device_id, body).get('contextResponses')
-        return handle_fiware_response(response)
+        return handle_response(response)
 
     def list_sensors(self, credentials, device_id):
         body = {
@@ -125,7 +136,7 @@ class Fiware(Cloud):
             if response.get('contextResponses'):
                 devices = omit_devices_parameters(response.get('contextResponses'))
                 return [{'id': sensor.get('id'), 'name': sensor.get('name')} for sensor in devices]
-            return handle_fiware_response(response)
+            return handle_response(response)
         except KeyError:
             return []
         except Exception as err:
@@ -149,7 +160,7 @@ class Fiware(Cloud):
             if response.get('contextResponses'):
                 devices = omit_devices_parameters(response.get('contextResponses'))
                 return [sensor for sensor in devices]
-            return handle_fiware_response(response)
+            return handle_response(response)
         except KeyError:
             return []
         except Exception as err:
@@ -194,9 +205,9 @@ class Fiware(Cloud):
         }
         credentials['id'] = device_id
         response = self.protocol.update(credentials, device_id, body).get('contextResponses')
-        return handle_fiware_response(response)
+        return handle_response(response)
 
-    def send_config(self, credentials, device_id, sensor_id, event_flags=FLAG_CHANGE, **kwargs):
+    def send_config(self, credentials, device_id, sensor_id, event_flags, **kwargs):
         logging.error('Missing implementation')
         time_sec = kwargs.get('time_sec')
         lower_limit = kwargs.get('lower_limit')
@@ -226,7 +237,7 @@ class Fiware(Cloud):
         }
         credentials['id'] = device_id
         response = self.protocol.update(credentials, device_id, body).get('contextResponses')
-        return handle_fiware_response(response)
+        return handle_response(response)
 
     def get_data(self, credentials, device_id, **kwargs):
         logging.error('Missing implementation')
@@ -257,4 +268,4 @@ class Fiware(Cloud):
         }
         credentials['id'] = device_id
         response = self.protocol.update(credentials, device_id, body).get('contextResponses')
-        return handle_fiware_response(response)
+        return handle_response(response)
