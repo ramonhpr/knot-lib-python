@@ -1,4 +1,7 @@
--   repo: https://github.com/pre-commit/mirrors-pylint
-    rev: 'v1.9.1'  # Use the sha / tag you want to point at
+-   repo: local
     hooks:
     -   id: pylint
+        name: pylint
+        entry: python -m pylint.__main__
+        language: system
+        types: [python]
