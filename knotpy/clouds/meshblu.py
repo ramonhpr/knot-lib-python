@@ -1,10 +1,10 @@
 import logging
 import functools
 from uuid import UUID
+from knotpy.decorators import omit
 from .proto_socketio import ProtoSocketio
 from .proto_http import ProtoHttp
 from .cloud import Cloud
-from .decorators import omit
 __all__ = []
 
 # Device parameters to be omitted

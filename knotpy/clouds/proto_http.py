@@ -1,6 +1,10 @@
 import logging
 import json
 import requests
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 from .proto import Protocol
 __all__ = []
 
@@ -9,27 +13,18 @@ class ProtoHttp(Protocol):
     def __parse_url(cls, credentials):
         return 'http://'+credentials.get('servername')+':'+str(credentials.get('port'))
 
-    @classmethod
-    def __query_parameter(cls, data):
-        ret = '?'
-        logging.info(data)
-        for key in data:
-            ret = ret + key + '=' + str(data.get(key)) + '&'
-        return ret
-
-    def __init__(self, headers, add_dev, rm_dev, list_dev, update_dev, add_data, list_data, subs):
+    def __init__(self, **kwargs):
+        self.cloud_headers = kwargs.get('headers')
         # Callbacks helpers
-        self.cloud_headers = headers
-        self.add_dev = add_dev
-        self.rm_dev = rm_dev
-        self.list_dev = list_dev
-        self.update_dev = update_dev
-        self.add_data = add_data
-        self.list_data = list_data
-        self.subs = subs
+        def destructurer_dev(add_dev, rm_dev, list_dev, update_dev):
+            return (add_dev, rm_dev, list_dev, update_dev)
+        def destructurer_data(add_data, list_data, subs):
+            return (add_data, list_data, subs)
+        self.add_dev, self.rm_dev, self.list_dev, self.update_dev = destructurer_dev(**kwargs)
+        self.add_data, self.list_data, self.subs = destructurer_data(**kwargs)
 
     @classmethod
-    def __do_request(cls, headers, url, type_req, body, stream=False):
+    def __do_request(cls, headers, url, type_req, body, stream=False): # pylint: disable=too-many-arguments
         logging.info('%s %s', type_req, url)
         logging.info('json -> %s', body)
         logging.info('Headers %s', headers)
@@ -96,6 +91,7 @@ class ProtoHttp(Protocol):
 
     def get_data(self, credentials, device_id, **kwargs):
         url = self.__parse_url(credentials) + self.list_data(device_id)['endpoint']
+        url = url + urlencode(kwargs)
         type_req = self.list_data(device_id)['type'].upper()
         return self.__do_request(self.cloud_headers(credentials), url, type_req, kwargs)
 
