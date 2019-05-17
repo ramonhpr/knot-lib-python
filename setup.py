@@ -31,7 +31,7 @@ setup(
         ]
     },
     cmdclass={'develop': PostInstall},
-    packages=['knotpy'],
+    packages=['knotpy', 'knotpy/decorators'],
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 4 - Beta",
